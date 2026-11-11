@@ -1,0 +1,2 @@
+# No PyPI dependencies. Python 3.10+ with Tkinter (Tcl/Tk) is required.
+# Windows Python installer typically includes Tkinter.
