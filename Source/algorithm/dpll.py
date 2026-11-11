@@ -1,4 +1,4 @@
-"""TODO -- teammate 3: implement DPLL with stats and complete models.
+"""TODO -- implement DPLL with stats and complete models.
 
 No third-party SAT backend. This solver should NOT know about board/cells/UI.
 """
@@ -15,4 +15,4 @@ def solve(clauses: list[list[int]], num_vars: int) -> SATResult:
     backtracking, full satisfying assignment 1..num_vars, runtime_ms.
     Do not mutate input clauses. Do not mistake an arbitrary model for proof.
     """
-    raise NotImplementedError("Teammate 3: implement DPLL solve(clauses, num_vars)")
+    raise NotImplementedError("implement DPLL solve(clauses, num_vars)")

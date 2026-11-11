@@ -1,4 +1,4 @@
-"""TODO -- teammate 2: propositional CNF encoding.
+"""TODO -- propositional CNF encoding.
 
 IMPORTANT: encode() accepts ONLY public state; it must not import engine or
 read puzzle files. Use regions.resolve_region for every counting template.
@@ -6,7 +6,7 @@ read puzzle files. Use regions.resolve_region for every counting template.
 from __future__ import annotations
 
 from models import EncodedKB, PublicState
-from regions import resolve_region  # noqa: F401 -- intentional integration point
+from regions import resolve_region
 
 
 def encode(public_state: PublicState) -> EncodedKB:
@@ -25,4 +25,4 @@ def encode(public_state: PublicState) -> EncodedKB:
       AT_LEAST k: for every (n-k+1)-subset, clause of positive literals
       EXACTLY k: concatenate both forms
     """
-    raise NotImplementedError("Teammate 2: implement CNF encode(public_state)")
+    raise NotImplementedError("implement CNF encode(public_state)")
