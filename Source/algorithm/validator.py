@@ -1,20 +1,40 @@
-"""TODO -- offline uniqueness and no-guess playthrough checks.
-
-Offline validation is permitted to read full puzzle data; gameplay agent is NOT.
-"""
-from __future__ import annotations
+﻿"""Offline checks; full clues are never passed to the gameplay agent."""
+from algorithm.agent import LogicAgent
+from algorithm.encoder import encode
+from algorithm.dpll import solve
+from controller import GameController
+from engine import GameEngine
+from semantics import evaluate_clue
 
 
 def check_uniqueness(puzzle: dict) -> str:
-    """Return UNIQUE / MULTIPLE / INCONSISTENT using TWO SAT calls.
-
-    Encode ALL clues (not the solution labels as unit clauses). If SAT, create
-    one blocking clause for PRIMARY variables only and solve again. Check the
-    unique assignment matches the hidden solution independently.
-    """
-    raise NotImplementedError("implement offline uniqueness check")
+    kb = encode({"size": puzzle["size"], "known_statuses": {},
+                 "revealed_clues": puzzle["clues"]})
+    first = solve(kb.clauses, kb.num_vars)
+    if first.status == "UNSAT":
+        return "INCONSISTENT"
+    blocking = [-v if first.assignment[v] else v for v in kb.cell_to_var.values()]
+    second = solve(kb.clauses + [blocking], kb.num_vars)
+    if second.status == "SAT":
+        return "MULTIPLE"
+    assignment = {cell: first.assignment[v] for cell, v in kb.cell_to_var.items()}
+    if not all(evaluate_clue(c, assignment, puzzle["size"]) for c in puzzle["clues"]):
+        raise ValueError("SAT assignment fails independent clue evaluation")
+    if assignment != puzzle["solution"]:
+        raise ValueError("Unique assignment does not match hidden solution")
+    return "UNIQUE"
 
 
 def check_progressive_solvability(puzzle: dict) -> dict:
-    """Run with public reveals only, detect STUCK even for unique puzzles."""
-    raise NotImplementedError("implement progressive solve check")
+    controller = GameController(GameEngine(LogicAgent()))
+    controller.engine.load_data(puzzle)
+    while True:
+        move, result = controller.auto_step()
+        if move.status != "MOVE":
+            status = move.status
+            break
+        if result.status != "ACCEPTED":
+            status = result.status
+            break
+    return {"status": status, "steps": controller.step, "trace": controller.trace,
+            "public_state": controller.engine.get_public_state()}

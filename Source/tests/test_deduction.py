@@ -4,7 +4,8 @@ import unittest
 from unittest.mock import patch
 
 from algorithm.agent import LogicAgent
-from models import EncodedKB, SATResult
+from algorithm.validator import check_uniqueness, check_progressive_solvability
+from models import EncodedKB, SATResult, MoveResult
 
 
 def kb():
@@ -68,3 +69,40 @@ class AgentContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             LogicAgent().classify(self.state, "Z9")
 
+
+class ValidatorContractTests(unittest.TestCase):
+    @patch("algorithm.validator.solve")
+    @patch("algorithm.validator.encode")
+    def test_uniqueness_blocks_only_primary_variables(self, encoder, solver):
+        encoder.return_value = EncodedKB([], {"A1": 1}, 1, 1, 2, 0)
+        solver.side_effect = [SATResult("SAT", {1: False, 2: True}), unsat()]
+        puzzle = {"size": 3, "clues": [], "solution": {"A1": False}}
+        self.assertEqual(check_uniqueness(puzzle), "UNIQUE")
+        self.assertEqual(solver.call_args_list[1].args, ([[1]], 2))
+        self.assertEqual(encoder.call_args.args[0]["known_statuses"], {})
+        self.assertNotIn("solution", encoder.call_args.args[0])
+
+    @patch("algorithm.validator.solve")
+    @patch("algorithm.validator.encode", return_value=kb())
+    def test_multiple_inconsistent_and_solution_mismatch(self, encoder, solver):
+        puzzle = {"size": 3, "clues": [], "solution": {"A1": True, "B1": True}}
+        solver.side_effect = [sat(), sat()]
+        self.assertEqual(check_uniqueness(puzzle), "MULTIPLE")
+        solver.side_effect = [unsat()]
+        self.assertEqual(check_uniqueness(puzzle), "INCONSISTENT")
+        solver.side_effect = [sat(), unsat()]
+        with self.assertRaises(ValueError):
+            check_uniqueness(puzzle)
+
+    @patch("algorithm.validator.GameController")
+    def test_progressive_returns_terminal_trace(self, controller_type):
+        controller = controller_type.return_value
+        controller.auto_step.return_value = (MoveResult("STUCK"), None)
+        controller.step = 0
+        controller.trace = []
+        controller.engine.get_public_state.return_value = {"size": 3}
+        report = check_progressive_solvability({"puzzle_id": "test"})
+        self.assertEqual(report["status"], "STUCK")
+        self.assertEqual(report["steps"], 0)
+        self.assertEqual(report["trace"], [])
+        controller.engine.load_data.assert_called_once_with({"puzzle_id": "test"})
