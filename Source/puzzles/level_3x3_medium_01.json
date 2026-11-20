@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "puzzle_id": "level_3x3_medium_01",
+  "size": 3,
+  "characters": [
+    {
+      "cell": "A1",
+      "name": "An",
+      "profession": "Thợ mộc"
+    },
+    {
+      "cell": "B1",
+      "name": "Bach",
+      "profession": "Kỹ sư"
+    },
+    {
+      "cell": "C1",
+      "name": "Binh",
+      "profession": "Nhà khoa học"
+    },
+    {
+      "cell": "A2",
+      "name": "Chi",
+      "profession": "Nhạc sĩ"
+    },
+    {
+      "cell": "B2",
+      "name": "Chinh",
+      "profession": "Đầu tư"
+    },
+    {
+      "cell": "C2",
+      "name": "Dai",
+      "profession": "Nghệ sĩ"
+    },
+    {
+      "cell": "A3",
+      "name": "Dao",
+      "profession": "Kế toán"
+    },
+    {
+      "cell": "B3",
+      "name": "Diem",
+      "profession": "Đạo diễn"
+    },
+    {
+      "cell": "C3",
+      "name": "Dung",
+      "profession": "Bác sĩ"
+    }
+  ],
+  "solution": {
+    "A1": false,
+    "B1": true,
+    "C1": false,
+    "A2": false,
+    "B2": true,
+    "C2": true,
+    "A3": false,
+    "B3": false,
+    "C3": true
+  },
+  "clues": [
+    {
+      "id": "clue_A1",
+      "owner": "A1",
+      "type": "DIFFERENT",
+      "cells": [
+        "C3",
+        "B3"
+      ]
+    },
+    {
+      "id": "clue_B1",
+      "owner": "B1",
+      "type": "EXACTLY",
+      "k": 2,
+      "region": {
+        "kind": "CELLS",
+        "cells": [
+          "A1",
+          "B1",
+          "C3"
+        ]
+      }
+    },
+    {
+      "id": "clue_C1",
+      "owner": "C1",
+      "type": "EXACTLY",
+      "k": 2,
+      "region": {
+        "kind": "NEIGHBORS",
+        "cell": "B1"
+      }
+    },
+    {
+      "id": "clue_A2",
+      "owner": "A2",
+      "type": "AT_MOST",
+      "k": 1,
+      "region": {
+        "kind": "ROW",
+        "index": 1
+      }
+    },
+    {
+      "id": "clue_B2",
+      "owner": "B2",
+      "type": "AT_MOST",
+      "k": 0,
+      "region": {
+        "kind": "COLUMN",
+        "label": "A"
+      }
+    },
+    {
+      "id": "clue_C2",
+      "owner": "C2",
+      "type": "AT_MOST",
+      "k": 1,
+      "region": {
+        "kind": "CORNERS"
+      }
+    },
+    {
+      "id": "clue_A3",
+      "owner": "A3",
+      "type": "AT_LEAST",
+      "k": 3,
+      "region": {
+        "kind": "CELLS",
+        "cells": [
+          "C1",
+          "C2",
+          "A3",
+          "A1",
+          "B2",
+          "C3",
+          "B3"
+        ]
+      }
+    },
+    {
+      "id": "clue_B3",
+      "owner": "B3",
+      "type": "AT_LEAST",
+      "k": 1,
+      "region": {
+        "kind": "COMMON_NEIGHBORS",
+        "cells": [
+          "A2",
+          "A3"
+        ]
+      }
+    },
+    {
+      "id": "clue_C3",
+      "owner": "C3",
+      "type": "SAME",
+      "cells": [
+        "B1",
+        "B2"
+      ]
+    }
+  ],
+  "initial_revealed": [
+    "A1",
+    "B1"
+  ]
+}

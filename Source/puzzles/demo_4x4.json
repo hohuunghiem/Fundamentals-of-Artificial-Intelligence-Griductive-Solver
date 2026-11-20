@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "puzzle_id": "demo_4x4_fact_chain",
+  "size": 4,
+  "characters": [
+    {
+      "cell": "A1",
+      "name": "An",
+      "profession": "Thám tử"
+    },
+    {
+      "cell": "B1",
+      "name": "Bach",
+      "profession": "Bác sĩ"
+    },
+    {
+      "cell": "C1",
+      "name": "Chi",
+      "profession": "Giáo viên"
+    },
+    {
+      "cell": "D1",
+      "name": "Dung",
+      "profession": "Kỹ sư"
+    },
+    {
+      "cell": "A2",
+      "name": "Giang",
+      "profession": "Đầu bếp"
+    },
+    {
+      "cell": "B2",
+      "name": "Ha",
+      "profession": "Luật sư"
+    },
+    {
+      "cell": "C2",
+      "name": "Hieu",
+      "profession": "Nghệ sĩ"
+    },
+    {
+      "cell": "D2",
+      "name": "Khanh",
+      "profession": "Kiến trúc sư"
+    },
+    {
+      "cell": "A3",
+      "name": "Lan",
+      "profession": "Nhà báo"
+    },
+    {
+      "cell": "B3",
+      "name": "Linh",
+      "profession": "Phi công"
+    },
+    {
+      "cell": "C3",
+      "name": "Minh",
+      "profession": "Nhà khoa học"
+    },
+    {
+      "cell": "D3",
+      "name": "Nam",
+      "profession": "Thủ thư"
+    },
+    {
+      "cell": "A4",
+      "name": "Oanh",
+      "profession": "Y tá"
+    },
+    {
+      "cell": "B4",
+      "name": "Phuc",
+      "profession": "Nhà thiết kế"
+    },
+    {
+      "cell": "C4",
+      "name": "Quang",
+      "profession": "Vận động viên"
+    },
+    {
+      "cell": "D4",
+      "name": "Trang",
+      "profession": "Họa sĩ"
+    }
+  ],
+  "solution": {
+    "A1": true,
+    "B1": false,
+    "C1": true,
+    "D1": false,
+    "A2": true,
+    "B2": false,
+    "C2": false,
+    "D2": true,
+    "A3": true,
+    "B3": false,
+    "C3": true,
+    "D3": false,
+    "A4": false,
+    "B4": true,
+    "C4": false,
+    "D4": true
+  },
+  "clues": [
+    {
+      "id": "clue_A1",
+      "owner": "A1",
+      "type": "FACT",
+      "cell": "B1",
+      "criminal": false
+    },
+    {
+      "id": "clue_B1",
+      "owner": "B1",
+      "type": "FACT",
+      "cell": "C1",
+      "criminal": true
+    },
+    {
+      "id": "clue_C1",
+      "owner": "C1",
+      "type": "FACT",
+      "cell": "D1",
+      "criminal": false
+    },
+    {
+      "id": "clue_D1",
+      "owner": "D1",
+      "type": "FACT",
+      "cell": "A2",
+      "criminal": true
+    },
+    {
+      "id": "clue_A2",
+      "owner": "A2",
+      "type": "FACT",
+      "cell": "B2",
+      "criminal": false
+    },
+    {
+      "id": "clue_B2",
+      "owner": "B2",
+      "type": "FACT",
+      "cell": "C2",
+      "criminal": false
+    },
+    {
+      "id": "clue_C2",
+      "owner": "C2",
+      "type": "FACT",
+      "cell": "D2",
+      "criminal": true
+    },
+    {
+      "id": "clue_D2",
+      "owner": "D2",
+      "type": "FACT",
+      "cell": "A3",
+      "criminal": true
+    },
+    {
+      "id": "clue_A3",
+      "owner": "A3",
+      "type": "FACT",
+      "cell": "B3",
+      "criminal": false
+    },
+    {
+      "id": "clue_B3",
+      "owner": "B3",
+      "type": "FACT",
+      "cell": "C3",
+      "criminal": true
+    },
+    {
+      "id": "clue_C3",
+      "owner": "C3",
+      "type": "FACT",
+      "cell": "D3",
+      "criminal": false
+    },
+    {
+      "id": "clue_D3",
+      "owner": "D3",
+      "type": "FACT",
+      "cell": "A4",
+      "criminal": false
+    },
+    {
+      "id": "clue_A4",
+      "owner": "A4",
+      "type": "FACT",
+      "cell": "B4",
+      "criminal": true
+    },
+    {
+      "id": "clue_B4",
+      "owner": "B4",
+      "type": "FACT",
+      "cell": "C4",
+      "criminal": false
+    },
+    {
+      "id": "clue_C4",
+      "owner": "C4",
+      "type": "FACT",
+      "cell": "D4",
+      "criminal": true
+    },
+    {
+      "id": "clue_D4",
+      "owner": "D4",
+      "type": "AT_MOST",
+      "k": 2,
+      "region": {
+        "kind": "COMMON_NEIGHBORS",
+        "cells": [
+          "B2",
+          "C2"
+        ]
+      }
+    }
+  ],
+  "initial_revealed": [
+    "A1"
+  ]
+}

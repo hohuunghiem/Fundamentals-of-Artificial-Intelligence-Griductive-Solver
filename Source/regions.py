@@ -5,12 +5,14 @@ COLS = "ABCDE"
 
 def all_cells(size):
     """Mọi ô theo thứ tự hàng: A1, B1, C1, A2, ..."""
+    if type(size) is not int or not 3 <= size <= 5:
+        raise ValueError("Board size must be 3, 4 or 5")
     return [f"{COLS[c]}{r}" for r in range(1, size + 1) for c in range(size)]
 
 
 def parse_cell(cell, size):
     """'B2' -> (row=2, col=2). Báo lỗi nếu ô không tồn tại."""
-    if not isinstance(cell, str) or len(cell) < 2:
+    if not isinstance(cell, str) or cell not in all_cells(size):
         raise ValueError(f"Mã ô không hợp lệ: {cell!r}")
     col = COLS.find(cell[0]) + 1
     if col == 0 or col > size or not cell[1:].isdigit():
@@ -33,6 +35,9 @@ def neighbors(cell, size):
 
 
 def resolve_region(region, size):
+    order = all_cells(size)
+    if not isinstance(region, dict):
+        raise ValueError("Region must be a dictionary")
     kind = region.get("kind")
     if kind == "ROW":
         i = region.get("index")
@@ -65,4 +70,25 @@ def resolve_region(region, size):
         chosen = neighbors(cells[0], size) & neighbors(cells[1], size)
     else:
         raise ValueError(f"Loại vùng không hỗ trợ: {kind!r}")
-    return [c for c in all_cells(size) if c in chosen]   # sắp theo thứ tự hàng
+    return [c for c in order if c in chosen]   # sắp theo thứ tự hàng
+
+
+def referenced_cells(clue, size):
+    """Return cells referenced by a public clue for GUI highlighting."""
+    order = all_cells(size)
+    if not isinstance(clue, dict):
+        raise ValueError("Clue must be a dictionary")
+    kind = clue.get("type")
+    if kind == "FACT":
+        parse_cell(clue.get("cell"), size)
+        return [clue["cell"]]
+    if kind in ("SAME", "DIFFERENT"):
+        cells = clue.get("cells")
+        if not isinstance(cells, list) or len(cells) != 2 or cells[0] == cells[1]:
+            raise ValueError("Binary clue requires two distinct cells")
+        for cell in cells:
+            parse_cell(cell, size)
+        return [cell for cell in order if cell in cells]
+    if kind in ("EXACTLY", "AT_LEAST", "AT_MOST"):
+        return resolve_region(clue.get("region"), size)
+    raise ValueError(f"Unsupported clue type: {kind!r}")

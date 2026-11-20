@@ -14,17 +14,28 @@ def build_var_map(size):
 
 def at_most(vars_, k):
     """Mỗi tập con k+1 biến: không thể tất cả đều True."""
+    _validate_count(vars_, k)
     return [[-v for v in combo] for combo in combinations(vars_, k + 1)]
 
 
 def at_least(vars_, k):
     """Mỗi tập con n-k+1 biến: phải có ít nhất 1 True."""
+    _validate_count(vars_, k)
     if k == 0:
         return []
     return [list(combo) for combo in combinations(vars_, len(vars_) - k + 1)]
 
 
+def _validate_count(vars_, k):
+    if type(k) is not int or not 0 <= k <= len(vars_):
+        raise ValueError("k must be an integer between 0 and the region size")
+
+
 def encode_clue(clue, size, var):
+    if not isinstance(clue, dict):
+        raise ValueError("Clue must be a dictionary")
+    if var != build_var_map(size):
+        raise ValueError("Variable mapping must match the board in row-major order")
     t = clue.get("type")
 
     if t == "FACT":
@@ -56,15 +67,23 @@ def encode_clue(clue, size, var):
 
 def encode(public_state):
     """KB_t = CNF(manh mối đã mở) ∧ unit clause của trạng thái đã biết."""
-    size = public_state["size"]
+    if not isinstance(public_state, dict):
+        raise ValueError("Public state must be a dictionary")
+    size = public_state.get("size")
     var = build_var_map(size)
+    clues = public_state.get("revealed_clues")
+    known = public_state.get("known_statuses")
+    if not isinstance(clues, list) or not isinstance(known, dict):
+        raise ValueError("Public state requires revealed_clues list and known_statuses dictionary")
     clauses = []
 
-    for clue in public_state["revealed_clues"]:
+    for clue in clues:
         clauses.extend(encode_clue(clue, size, var))
 
-    for cell, criminal in public_state["known_statuses"].items():
+    for cell, criminal in known.items():
         parse_cell(cell, size)
+        if type(criminal) is not bool:
+            raise ValueError("Known verdicts must be boolean")
         clauses.append([var[cell]] if criminal else [-var[cell]])
 
     primary = size * size

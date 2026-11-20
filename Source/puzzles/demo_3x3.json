@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "puzzle_id": "demo_3x3_fact_chain",
+  "size": 3,
+  "characters": [
+    {
+      "cell": "A1",
+      "name": "An",
+      "profession": "Thám tử"
+    },
+    {
+      "cell": "B1",
+      "name": "Binh",
+      "profession": "Bác sĩ"
+    },
+    {
+      "cell": "C1",
+      "name": "Chi",
+      "profession": "Giáo viên"
+    },
+    {
+      "cell": "A2",
+      "name": "Dung",
+      "profession": "Kỹ sư"
+    },
+    {
+      "cell": "B2",
+      "name": "Giang",
+      "profession": "Đầu bếp"
+    },
+    {
+      "cell": "C2",
+      "name": "Ha",
+      "profession": "Luật sư"
+    },
+    {
+      "cell": "A3",
+      "name": "Khoa",
+      "profession": "Nghệ sĩ"
+    },
+    {
+      "cell": "B3",
+      "name": "Lan",
+      "profession": "Kiến trúc sư"
+    },
+    {
+      "cell": "C3",
+      "name": "Minh",
+      "profession": "Nhà báo"
+    }
+  ],
+  "solution": {
+    "A1": false,
+    "B1": true,
+    "C1": true,
+    "A2": false,
+    "B2": false,
+    "C2": true,
+    "A3": false,
+    "B3": true,
+    "C3": false
+  },
+  "clues": [
+    {
+      "id": "clue_A1",
+      "owner": "A1",
+      "type": "FACT",
+      "cell": "B1",
+      "criminal": true
+    },
+    {
+      "id": "clue_B1",
+      "owner": "B1",
+      "type": "FACT",
+      "cell": "C1",
+      "criminal": true
+    },
+    {
+      "id": "clue_C1",
+      "owner": "C1",
+      "type": "FACT",
+      "cell": "A2",
+      "criminal": false
+    },
+    {
+      "id": "clue_A2",
+      "owner": "A2",
+      "type": "FACT",
+      "cell": "B2",
+      "criminal": false
+    },
+    {
+      "id": "clue_B2",
+      "owner": "B2",
+      "type": "FACT",
+      "cell": "C2",
+      "criminal": true
+    },
+    {
+      "id": "clue_C2",
+      "owner": "C2",
+      "type": "FACT",
+      "cell": "A3",
+      "criminal": false
+    },
+    {
+      "id": "clue_A3",
+      "owner": "A3",
+      "type": "FACT",
+      "cell": "B3",
+      "criminal": true
+    },
+    {
+      "id": "clue_B3",
+      "owner": "B3",
+      "type": "FACT",
+      "cell": "C3",
+      "criminal": false
+    },
+    {
+      "id": "clue_C3",
+      "owner": "C3",
+      "type": "EXACTLY",
+      "k": 1,
+      "region": {
+        "kind": "CORNERS"
+      }
+    }
+  ],
+  "initial_revealed": [
+    "A1"
+  ]
+}

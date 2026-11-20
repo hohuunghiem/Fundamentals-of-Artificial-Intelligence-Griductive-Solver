@@ -1,0 +1,299 @@
+{
+  "schema_version": 1,
+  "puzzle_id": "level_4x4_hard",
+  "size": 4,
+  "characters": [
+    {
+      "cell": "A1",
+      "name": "An",
+      "profession": "Bác sĩ"
+    },
+    {
+      "cell": "B1",
+      "name": "Bach",
+      "profession": "Kiến trúc sư"
+    },
+    {
+      "cell": "C1",
+      "name": "Binh",
+      "profession": "Thủ thư"
+    },
+    {
+      "cell": "D1",
+      "name": "Chi",
+      "profession": "Nhà nghiên cứu"
+    },
+    {
+      "cell": "A2",
+      "name": "Chinh",
+      "profession": "Giáo viên"
+    },
+    {
+      "cell": "B2",
+      "name": "Dai",
+      "profession": "Dược sĩ"
+    },
+    {
+      "cell": "C2",
+      "name": "Dao",
+      "profession": "Biên tập viên"
+    },
+    {
+      "cell": "D2",
+      "name": "Diem",
+      "profession": "Thám tử"
+    },
+    {
+      "cell": "A3",
+      "name": "Dung",
+      "profession": "Đầu bếp"
+    },
+    {
+      "cell": "B3",
+      "name": "Giang",
+      "profession": "Nhiếp ảnh gia"
+    },
+    {
+      "cell": "C3",
+      "name": "Ha",
+      "profession": "Nhà thiết kế"
+    },
+    {
+      "cell": "D3",
+      "name": "Hai",
+      "profession": "Luật sư"
+    },
+    {
+      "cell": "A4",
+      "name": "Hanh",
+      "profession": "Thợ may"
+    },
+    {
+      "cell": "B4",
+      "name": "Hoa",
+      "profession": "Lập trình viên"
+    },
+    {
+      "cell": "C4",
+      "name": "Hoang",
+      "profession": "Nhà khảo cổ"
+    },
+    {
+      "cell": "D4",
+      "name": "Huong",
+      "profession": "Nhà báo"
+    }
+  ],
+  "solution": {
+    "A1": false,
+    "B1": true,
+    "C1": false,
+    "D1": true,
+    "A2": false,
+    "B2": true,
+    "C2": true,
+    "D2": false,
+    "A3": false,
+    "B3": true,
+    "C3": false,
+    "D3": true,
+    "A4": false,
+    "B4": false,
+    "C4": true,
+    "D4": true
+  },
+  "clues": [
+    {
+      "id": "clue_A1",
+      "owner": "A1",
+      "type": "SAME",
+      "cells": [
+        "B2",
+        "D4"
+      ]
+    },
+    {
+      "id": "clue_B1",
+      "owner": "B1",
+      "type": "EXACTLY",
+      "k": 2,
+      "region": {
+        "kind": "CELLS",
+        "cells": [
+          "A1",
+          "B1",
+          "B2"
+        ]
+      }
+    },
+    {
+      "id": "clue_C1",
+      "owner": "C1",
+      "type": "AT_LEAST",
+      "k": 3,
+      "region": {
+        "kind": "COLUMN",
+        "label": "B"
+      }
+    },
+    {
+      "id": "clue_D1",
+      "owner": "D1",
+      "type": "AT_LEAST",
+      "k": 2,
+      "region": {
+        "kind": "CELLS",
+        "cells": [
+          "D3",
+          "A4",
+          "B3",
+          "B4",
+          "A3"
+        ]
+      }
+    },
+    {
+      "id": "clue_A2",
+      "owner": "A2",
+      "type": "AT_LEAST",
+      "k": 2,
+      "region": {
+        "kind": "COMMON_NEIGHBORS",
+        "cells": [
+          "B1",
+          "B3"
+        ]
+      }
+    },
+    {
+      "id": "clue_B2",
+      "owner": "B2",
+      "type": "AT_MOST",
+      "k": 2,
+      "region": {
+        "kind": "NEIGHBORS",
+        "cell": "A1"
+      }
+    },
+    {
+      "id": "clue_C2",
+      "owner": "C2",
+      "type": "DIFFERENT",
+      "cells": [
+        "C2",
+        "A3"
+      ]
+    },
+    {
+      "id": "clue_D2",
+      "owner": "D2",
+      "type": "AT_MOST",
+      "k": 1,
+      "region": {
+        "kind": "CELLS",
+        "cells": [
+          "A3",
+          "B1",
+          "D2",
+          "B4"
+        ]
+      }
+    },
+    {
+      "id": "clue_A3",
+      "owner": "A3",
+      "type": "EXACTLY",
+      "k": 2,
+      "region": {
+        "kind": "ROW",
+        "index": 2
+      }
+    },
+    {
+      "id": "clue_B3",
+      "owner": "B3",
+      "type": "AT_MOST",
+      "k": 1,
+      "region": {
+        "kind": "COMMON_NEIGHBORS",
+        "cells": [
+          "A3",
+          "B3"
+        ]
+      }
+    },
+    {
+      "id": "clue_C3",
+      "owner": "C3",
+      "type": "AT_LEAST",
+      "k": 3,
+      "region": {
+        "kind": "NEIGHBORS",
+        "cell": "D3"
+      }
+    },
+    {
+      "id": "clue_D3",
+      "owner": "D3",
+      "type": "EXACTLY",
+      "k": 1,
+      "region": {
+        "kind": "CELLS",
+        "cells": [
+          "D1",
+          "A1",
+          "C3",
+          "B4",
+          "D2"
+        ]
+      }
+    },
+    {
+      "id": "clue_A4",
+      "owner": "A4",
+      "type": "EXACTLY",
+      "k": 2,
+      "region": {
+        "kind": "CELLS",
+        "cells": [
+          "A4",
+          "B4",
+          "D1",
+          "D4"
+        ]
+      }
+    },
+    {
+      "id": "clue_B4",
+      "owner": "B4",
+      "type": "AT_LEAST",
+      "k": 3,
+      "region": {
+        "kind": "COLUMN",
+        "label": "B"
+      }
+    },
+    {
+      "id": "clue_C4",
+      "owner": "C4",
+      "type": "DIFFERENT",
+      "cells": [
+        "C1",
+        "D3"
+      ]
+    },
+    {
+      "id": "clue_D4",
+      "owner": "D4",
+      "type": "EXACTLY",
+      "k": 2,
+      "region": {
+        "kind": "CORNERS"
+      }
+    }
+  ],
+  "initial_revealed": [
+    "A1",
+    "B1"
+  ]
+}
