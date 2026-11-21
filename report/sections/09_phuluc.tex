@@ -1,0 +1,40 @@
+\section{Hướng dẫn cài đặt và chạy chương trình}
+\begin{lstlisting}[language=bash]
+# Create and activate the environment
+conda create -n lab2 python=3.10 pip -y
+conda activate lab2
+
+# Install dependencies
+cd Source
+pip install -r requirements.txt
+
+# Run the game
+python main.py
+
+# Run tests
+python -m unittest discover -s tests -v
+
+# Run repeated experiments
+python -m experiments.run_experiments
+
+# Generate charts
+python -m experiments.plot_results
+\end{lstlisting}
+
+\section{Phân công công việc}
+% Giữ thành viên và MSSV như trang bìa; cập nhật phân công đã thống nhất.
+\begin{table}[htbp]\centering
+\caption{Phân công công việc của nhóm}
+\begin{tabularx}{\linewidth}{|p{0.27\linewidth}|Y|}
+\hline
+Thành viên & Công việc phụ trách\\\hline
+Chu Bảo Minh & Core Game; điều phối báo cáo; video demo.\\\hline
+Võ Trúc Quỳnh & CNF Encoder.\\\hline
+Trần Thị Bích Hạnh & DPLL SAT Solver.\\\hline
+Huỳnh Thanh Huy & Logic Agent.\\\hline
+Hồ Hữu Nghiêm & Validator và Experiments.\\\hline
+\end{tabularx}
+\end{table}
+
+\section{Khai báo sử dụng công cụ AI}
+% Khai báo trung thực công cụ, mục đích và phạm vi sử dụng theo yêu cầu học phần.
