@@ -38,3 +38,50 @@ def check_progressive_solvability(puzzle: dict) -> dict:
             break
     return {"status": status, "steps": controller.step, "trace": controller.trace,
             "public_state": controller.engine.get_public_state()}
+
+
+def validate_puzzle(puzzle: dict) -> dict:
+    """
+    Perform a complete validation of a puzzle.
+    """
+    result = {
+        "puzzle_id": puzzle.get("puzzle_id", "unknown"),
+        "valid_structure": False,
+        "uniqueness": "NOT_CHECKED",
+        "solvability": "NOT_CHECKED",
+        "steps": 0,
+        "is_valid": False,
+        "errors": []
+    }
+
+    try:
+        GameEngine._validated_data(puzzle)
+        result["valid_structure"] = True
+
+    except (ValueError, TypeError, KeyError) as e:
+        result["errors"].append(str(e))
+        return result
+
+    try:
+        result["uniqueness"] = check_uniqueness(puzzle)
+
+    except Exception as e:
+        result["errors"].append(f"Uniqueness check failed: {e}")
+        return result
+
+    try:
+        progress = check_progressive_solvability(puzzle)
+        result["solvability"] = progress["status"]
+        result["steps"] = progress["steps"]
+
+    except Exception as e:
+        result["errors"].append(f"Solvability check failed: {e}")
+        return result
+
+    result["is_valid"] = (
+        result["valid_structure"]
+        and result["uniqueness"] == "UNIQUE"
+        and result["solvability"] == "SOLVED"
+    )
+
+    return result
