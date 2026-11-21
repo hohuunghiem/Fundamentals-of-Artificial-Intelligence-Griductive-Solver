@@ -211,14 +211,11 @@
     {
       "id": "clue_D4",
       "owner": "D4",
-      "type": "AT_MOST",
-      "k": 2,
+      "type": "AT_LEAST",
+      "k": 1,
       "region": {
-        "kind": "COMMON_NEIGHBORS",
-        "cells": [
-          "B2",
-          "C2"
-        ]
+          "kind": "COMMON_NEIGHBORS",
+          "cells": ["B1", "A2"]
       }
     }
   ],
