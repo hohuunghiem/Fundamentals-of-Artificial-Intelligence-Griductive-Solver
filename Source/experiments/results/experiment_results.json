@@ -21,7 +21,7 @@
             "propagations": 273,
             "backtracks": 0,
             "deduction_steps": 8,
-            "runtime_ms": 5.944106000242755,
+            "runtime_ms": 6.433200000060424,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -40,7 +40,7 @@
             "propagations": 273,
             "backtracks": 0,
             "deduction_steps": 8,
-            "runtime_ms": 5.689905000053841,
+            "runtime_ms": 5.6861000000481,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -59,7 +59,7 @@
             "propagations": 273,
             "backtracks": 0,
             "deduction_steps": 8,
-            "runtime_ms": 5.8353049998913775,
+            "runtime_ms": 5.796499999974003,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -78,7 +78,7 @@
             "propagations": 273,
             "backtracks": 0,
             "deduction_steps": 8,
-            "runtime_ms": 5.667906000326184,
+            "runtime_ms": 5.980499999964195,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -97,7 +97,7 @@
             "propagations": 273,
             "backtracks": 0,
             "deduction_steps": 8,
-            "runtime_ms": 5.639206000068953,
+            "runtime_ms": 5.633200000033867,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -108,15 +108,15 @@
             "repeat": 1,
             "primary_variables": 16,
             "auxiliary_variables": 0,
-            "cnf_clauses": 19,
+            "cnf_clauses": 16,
             "initial_cnf_clauses": 2,
-            "uniqueness": "MULTIPLE",
+            "uniqueness": "UNIQUE",
             "sat_calls": 91,
             "decisions": 420,
             "propagations": 826,
             "backtracks": 0,
             "deduction_steps": 15,
-            "runtime_ms": 17.670617000021593,
+            "runtime_ms": 17.101900000056958,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -127,15 +127,15 @@
             "repeat": 2,
             "primary_variables": 16,
             "auxiliary_variables": 0,
-            "cnf_clauses": 19,
+            "cnf_clauses": 16,
             "initial_cnf_clauses": 2,
-            "uniqueness": "MULTIPLE",
+            "uniqueness": "UNIQUE",
             "sat_calls": 91,
             "decisions": 420,
             "propagations": 826,
             "backtracks": 0,
             "deduction_steps": 15,
-            "runtime_ms": 17.228617000000668,
+            "runtime_ms": 17.440000000078726,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -146,15 +146,15 @@
             "repeat": 3,
             "primary_variables": 16,
             "auxiliary_variables": 0,
-            "cnf_clauses": 19,
+            "cnf_clauses": 16,
             "initial_cnf_clauses": 2,
-            "uniqueness": "MULTIPLE",
+            "uniqueness": "UNIQUE",
             "sat_calls": 91,
             "decisions": 420,
             "propagations": 826,
             "backtracks": 0,
             "deduction_steps": 15,
-            "runtime_ms": 16.702016000181175,
+            "runtime_ms": 17.661900000007336,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -165,15 +165,15 @@
             "repeat": 4,
             "primary_variables": 16,
             "auxiliary_variables": 0,
-            "cnf_clauses": 19,
+            "cnf_clauses": 16,
             "initial_cnf_clauses": 2,
-            "uniqueness": "MULTIPLE",
+            "uniqueness": "UNIQUE",
             "sat_calls": 91,
             "decisions": 420,
             "propagations": 826,
             "backtracks": 0,
             "deduction_steps": 15,
-            "runtime_ms": 16.664017000039166,
+            "runtime_ms": 17.631999999935033,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -184,15 +184,15 @@
             "repeat": 5,
             "primary_variables": 16,
             "auxiliary_variables": 0,
-            "cnf_clauses": 19,
+            "cnf_clauses": 16,
             "initial_cnf_clauses": 2,
-            "uniqueness": "MULTIPLE",
+            "uniqueness": "UNIQUE",
             "sat_calls": 91,
             "decisions": 420,
             "propagations": 826,
             "backtracks": 0,
             "deduction_steps": 15,
-            "runtime_ms": 16.950116000316484,
+            "runtime_ms": 17.244399999981397,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -211,7 +211,7 @@
             "propagations": 401,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 9.012008999889076,
+            "runtime_ms": 9.065800000030322,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -230,7 +230,7 @@
             "propagations": 401,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 9.170908999749372,
+            "runtime_ms": 8.912499999951251,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -249,7 +249,7 @@
             "propagations": 401,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 9.702710000055959,
+            "runtime_ms": 8.931200000006356,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -268,7 +268,7 @@
             "propagations": 401,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 8.604909000041516,
+            "runtime_ms": 9.37639999995099,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -287,7 +287,7 @@
             "propagations": 401,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 9.180209000078321,
+            "runtime_ms": 8.798800000022311,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -306,7 +306,7 @@
             "propagations": 357,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 11.740811999970902,
+            "runtime_ms": 8.85290000007899,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -325,7 +325,7 @@
             "propagations": 357,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 8.317608000197652,
+            "runtime_ms": 8.571899999992638,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -344,7 +344,7 @@
             "propagations": 357,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 8.884408000085386,
+            "runtime_ms": 8.817500000077416,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -363,7 +363,7 @@
             "propagations": 357,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 9.253208999780327,
+            "runtime_ms": 23.013199999923017,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -382,7 +382,7 @@
             "propagations": 357,
             "backtracks": 0,
             "deduction_steps": 7,
-            "runtime_ms": 8.564707999994425,
+            "runtime_ms": 12.969399999974485,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -401,7 +401,7 @@
             "propagations": 1462,
             "backtracks": 0,
             "deduction_steps": 14,
-            "runtime_ms": 36.429536000014195,
+            "runtime_ms": 54.168300000014824,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -420,7 +420,7 @@
             "propagations": 1462,
             "backtracks": 0,
             "deduction_steps": 14,
-            "runtime_ms": 35.03143399984765,
+            "runtime_ms": 40.52760000001854,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -439,7 +439,7 @@
             "propagations": 1462,
             "backtracks": 0,
             "deduction_steps": 14,
-            "runtime_ms": 36.13613500010615,
+            "runtime_ms": 35.67090000001372,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -458,7 +458,7 @@
             "propagations": 1462,
             "backtracks": 0,
             "deduction_steps": 14,
-            "runtime_ms": 36.42663599976004,
+            "runtime_ms": 35.56049999997413,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -477,7 +477,7 @@
             "propagations": 1462,
             "backtracks": 0,
             "deduction_steps": 14,
-            "runtime_ms": 37.294436000138376,
+            "runtime_ms": 35.92449999996461,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -496,7 +496,7 @@
             "propagations": 1062,
             "backtracks": 0,
             "deduction_steps": 13,
-            "runtime_ms": 30.957630000102654,
+            "runtime_ms": 26.9329000000198,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -515,7 +515,7 @@
             "propagations": 1062,
             "backtracks": 0,
             "deduction_steps": 13,
-            "runtime_ms": 26.06092499991064,
+            "runtime_ms": 26.508899999953428,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -534,7 +534,7 @@
             "propagations": 1062,
             "backtracks": 0,
             "deduction_steps": 13,
-            "runtime_ms": 26.147426000079577,
+            "runtime_ms": 26.469501000065065,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -553,7 +553,7 @@
             "propagations": 1062,
             "backtracks": 0,
             "deduction_steps": 13,
-            "runtime_ms": 27.425127000242355,
+            "runtime_ms": 26.7002999999022,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -572,7 +572,7 @@
             "propagations": 1062,
             "backtracks": 0,
             "deduction_steps": 13,
-            "runtime_ms": 27.080426000338775,
+            "runtime_ms": 27.881299999990006,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -591,7 +591,7 @@
             "propagations": 4279,
             "backtracks": 0,
             "deduction_steps": 23,
-            "runtime_ms": 136.27203399983046,
+            "runtime_ms": 136.11839899999723,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -610,7 +610,7 @@
             "propagations": 4279,
             "backtracks": 0,
             "deduction_steps": 23,
-            "runtime_ms": 144.68804100033594,
+            "runtime_ms": 134.39139800004796,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -629,7 +629,7 @@
             "propagations": 4279,
             "backtracks": 0,
             "deduction_steps": 23,
-            "runtime_ms": 136.15263299971048,
+            "runtime_ms": 135.518597999976,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -648,7 +648,7 @@
             "propagations": 4279,
             "backtracks": 0,
             "deduction_steps": 23,
-            "runtime_ms": 133.4576310000557,
+            "runtime_ms": 136.10179800002697,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -667,7 +667,7 @@
             "propagations": 4279,
             "backtracks": 0,
             "deduction_steps": 23,
-            "runtime_ms": 137.9829359998439,
+            "runtime_ms": 143.79189800001768,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -686,7 +686,7 @@
             "propagations": 3047,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 91.86159000000771,
+            "runtime_ms": 86.10799899997801,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -705,7 +705,7 @@
             "propagations": 3047,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 88.4521869998025,
+            "runtime_ms": 88.96319799998764,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -724,7 +724,7 @@
             "propagations": 3047,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 84.59198299988202,
+            "runtime_ms": 94.42979899995407,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -743,7 +743,7 @@
             "propagations": 3047,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 86.0637850000785,
+            "runtime_ms": 87.16209799990793,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -762,7 +762,7 @@
             "propagations": 3047,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 90.33428800012189,
+            "runtime_ms": 84.90709900002003,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -781,7 +781,7 @@
             "propagations": 3621,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 121.41451900015454,
+            "runtime_ms": 121.0918980000315,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -800,7 +800,7 @@
             "propagations": 3621,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 124.26022199997533,
+            "runtime_ms": 122.01529800006483,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -819,7 +819,7 @@
             "propagations": 3621,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 118.44051600019156,
+            "runtime_ms": 123.81749799999398,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -838,7 +838,7 @@
             "propagations": 3621,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 125.78512300024158,
+            "runtime_ms": 119.65179799994985,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -857,7 +857,7 @@
             "propagations": 3621,
             "backtracks": 0,
             "deduction_steps": 22,
-            "runtime_ms": 119.54701700005899,
+            "runtime_ms": 122.68219800000679,
             "solvability": "SOLVED",
             "status": "COMPLETED",
             "error": ""
@@ -888,8 +888,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 8,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 5.755285600116622,
-            "stdev_runtime_ms": 0.12984658131371654,
+            "avg_runtime_ms": 5.905900000016118,
+            "stdev_runtime_ms": 0.3233636265972309,
             "overall_status": "SUCCESS"
         },
         {
@@ -897,13 +897,13 @@
             "size": 4,
             "primary_variables": 16,
             "auxiliary_variables": 0,
-            "cnf_clauses": 19,
+            "cnf_clauses": 16,
             "initial_cnf_clauses": 2,
             "repeat_count": 5,
             "completed_runs": 5,
             "timeouts": 0,
             "errors": 0,
-            "uniqueness": "MULTIPLE",
+            "uniqueness": "UNIQUE",
             "solved_runs": 5,
             "failed_solving_runs": 0,
             "avg_sat_calls": 91,
@@ -916,9 +916,9 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 15,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 17.043076600111817,
-            "stdev_runtime_ms": 0.41739740651339474,
-            "overall_status": "INVALID_OR_INCOMPLETE"
+            "avg_runtime_ms": 17.41604000001189,
+            "stdev_runtime_ms": 0.24279835870013608,
+            "overall_status": "SUCCESS"
         },
         {
             "puzzle_id": "level_3x3_medium_01",
@@ -944,8 +944,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 7,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 9.134149199962849,
-            "stdev_runtime_ms": 0.3942548633677119,
+            "avg_runtime_ms": 9.016939999992246,
+            "stdev_runtime_ms": 0.22217274358429304,
             "overall_status": "SUCCESS"
         },
         {
@@ -972,8 +972,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 7,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 9.352149000005738,
-            "stdev_runtime_ms": 1.380635732446868,
+            "avg_runtime_ms": 12.44498000000931,
+            "stdev_runtime_ms": 6.185157412412274,
             "overall_status": "SUCCESS"
         },
         {
@@ -1000,8 +1000,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 14,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 36.26363539997328,
-            "stdev_runtime_ms": 0.8141281723972186,
+            "avg_runtime_ms": 40.37035999999716,
+            "stdev_runtime_ms": 7.990513458358755,
             "overall_status": "SUCCESS"
         },
         {
@@ -1028,8 +1028,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 13,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 27.5343068001348,
-            "stdev_runtime_ms": 2.001959166876274,
+            "avg_runtime_ms": 26.8985801999861,
+            "stdev_runtime_ms": 0.5792647731913618,
             "overall_status": "SUCCESS"
         },
         {
@@ -1056,8 +1056,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 23,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 137.7106549999553,
-            "stdev_runtime_ms": 4.223248998702812,
+            "avg_runtime_ms": 137.18441820001317,
+            "stdev_runtime_ms": 3.759759683675075,
             "overall_status": "SUCCESS"
         },
         {
@@ -1084,8 +1084,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 22,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 88.26076659997852,
-            "stdev_runtime_ms": 2.982815917013458,
+            "avg_runtime_ms": 88.31403859996954,
+            "stdev_runtime_ms": 3.7291000421400637,
             "overall_status": "SUCCESS"
         },
         {
@@ -1112,8 +1112,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 22,
             "stdev_deduction_steps": 0.0,
-            "avg_runtime_ms": 121.8894794001244,
-            "stdev_runtime_ms": 3.0985692482667675,
+            "avg_runtime_ms": 121.85173800000939,
+            "stdev_runtime_ms": 1.580958640523336,
             "overall_status": "SUCCESS"
         }
     ],
@@ -1134,8 +1134,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 7.333333333333333,
             "stdev_deduction_steps": 0.4879500364742666,
-            "avg_runtime_ms": 8.080527933361736,
-            "stdev_runtime_ms": 1.8705090469311696
+            "avg_runtime_ms": 9.122606666672558,
+            "stdev_runtime_ms": 4.31461839784568
         },
         {
             "size": 4,
@@ -1153,8 +1153,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 14,
             "stdev_deduction_steps": 0.8451542547285166,
-            "avg_runtime_ms": 26.947006266739965,
-            "stdev_runtime_ms": 8.218190098576857
+            "avg_runtime_ms": 28.228326733331716,
+            "stdev_runtime_ms": 10.648557671182637
         },
         {
             "size": 5,
@@ -1172,8 +1172,8 @@
             "stdev_backtracks": 0.0,
             "avg_deduction_steps": 22.333333333333332,
             "stdev_deduction_steps": 0.4879500364742666,
-            "avg_runtime_ms": 115.95363366668607,
-            "stdev_runtime_ms": 21.58508456311206
+            "avg_runtime_ms": 115.78339826666404,
+            "stdev_runtime_ms": 21.32928277196622
         }
     ]
 }

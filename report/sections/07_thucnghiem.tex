@@ -1,12 +1,22 @@
 \clearpage
 \section{Thực nghiệm và đánh giá}
 \subsection{Thiết lập thực nghiệm}
-% Bộ 9 puzzle: 3x3, 4x4, 5x5; 5 lượt/puzzle; timeout 30 giây/lượt.
-% Điền cấu hình CPU/RAM/OS/Python thực tế nếu xác minh được.
-% Phân biệt thời gian giải tuần tự và thời gian kiểm tra uniqueness.
+Nhóm chạy thực nghiệm trên Ubuntu với Python 3.10.22. Bộ dữ liệu gồm
+9 màn chơi, với 3 màn cho mỗi kích thước $3\times3$, $4\times4$ và
+$5\times5$. Mỗi màn được chạy 5 lần từ cùng trạng thái ban đầu, với
+giới hạn 30 giây cho mỗi lượt. Trước các lượt giải, nhóm kiểm tra tính
+duy nhất của nghiệm trên toàn bộ tập manh mối. Thời gian giải được đo
+riêng cho vòng suy luận và mở thẻ của agent.
+
 \subsection{Chỉ số đánh giá}
-% Primary variables, auxiliary variables, CNF clauses, SAT calls,
-% decisions, propagations, backtracks, deduction steps, runtime.
+Với mỗi màn, nhóm ghi số biến chính, số biến phụ và số mệnh đề CNF
+khi mã hóa toàn bộ manh mối. Trong mỗi lượt giải, nhóm đếm số lần gọi
+SAT, số quyết định phân nhánh, số phép gán do lan truyền đơn vị và
+số lần quay lui của DPLL. Mỗi thẻ được mở sau một kết luận hợp lệ
+được tính là một bước suy luận. Thời gian giải được ghi bằng mili giây.
+Bảng kết quả trình bày giá trị trung bình của các lượt hoàn tất và
+thống kê riêng số lượt lỗi hoặc vượt thời gian.
+
 \subsection{Kết quả theo kích thước bàn cờ}
 \begin{figure}[htbp]\centering
 \includegraphics[width=0.88\linewidth]{runtime_by_size.png}
@@ -42,9 +52,28 @@
 \caption{Số CNF clauses của từng puzzle.}
 \end{figure}
 \subsection{Phân tích kết quả}
+Nhóm chạy 9 màn chơi, mỗi màn 5 lần. Agent giải thành công cả 45 lượt,
+không có lỗi hoặc lượt nào vượt giới hạn 30 giây. Khi kiểm tra toàn bộ
+manh mối, cả 9 màn đều có nghiệm duy nhất.
+
+Trên bộ màn đã thử, thời gian giải trung bình của bàn $3\times3$,
+$4\times4$ và $5\times5$ lần lượt là 9,12 ms, 28,23 ms và 115,78 ms.
+Số lần gọi SAT trung bình tương ứng là 53,67, 107,00 và 226,33.
+
+Ở cùng kích thước $4\times4$, màn hard có 88 mệnh đề CNF và cần
+143 lần gọi SAT, trong khi màn medium có 118 mệnh đề và chỉ cần 87 lần gọi.
+Màn hard mất trung bình 40,37 ms, so với 26,90 ms của màn medium.
+Ví dụ này cho thấy số mệnh đề CNF riêng lẻ chưa đủ để dự đoán thời gian giải.
 % Phân tích số liệu từ experiment_size_summary.csv và experiment_summary.csv.
 % Không suy rộng ngoài 9 puzzle/45 lượt chạy.
 \subsection{Trường hợp đặc biệt và hạn chế}
-% Báo cáo demo_4x4 MULTIPLE nhưng SOLVED(5/5) đúng thực tế hiện tại.
+Ở màn \texttt{demo\_4x4\_fact\_chain}, toàn bộ manh mối xác định
+một nghiệm duy nhất (\texttt{UNIQUE}). Từ một thẻ mở ban đầu, agent
+suy ra trạng thái của 15 thẻ còn lại và giải xong cả 5 lượt, với
+thời gian trung bình 17,42 ms.
+
+Trong 45 lượt giải, DPLL ghi nhận 0 lần quay lui. Mỗi kích thước
+bàn chỉ có ba màn thử, nên cần bổ sung các màn buộc DPLL phải quay
+lui để đánh giá chi phí tìm kiếm trong những trường hợp khó hơn.
 % Nêu rõ đây là tính duy nhất khác với khả năng giải tuần tự.
 % Cập nhật lại nếu nhóm thay puzzle và chạy lại thí nghiệm.
