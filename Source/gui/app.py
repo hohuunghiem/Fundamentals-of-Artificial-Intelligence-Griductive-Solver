@@ -28,7 +28,8 @@ class GriductiveApp:
         self.root.configure(bg=t.BG)
         # Respect available desktop height (e.g. 1366x768 laptops / Windows taskbar).
         # Layout below reserves space for the deduction log even in short windows.
-        self.root.state("zoomed")
+        if self.root.tk.call("tk", "windowingsystem") == "win32":
+            self.root.state("zoomed")
         self._build()
         self.load(self.default_path)
 
