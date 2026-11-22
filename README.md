@@ -4,6 +4,16 @@ Griductive Solver là trò chơi suy luận logic được xây dựng bằng Py
 
 Dự án được thực hiện trong học phần **CSC14003 - Cơ sở Trí tuệ Nhân tạo**.
 
+## Nhóm 8 — Thành viên thực hiện
+
+| MSSV | Họ và tên | Phần phụ trách |
+|---|---|---|
+| 24120323 | Huỳnh Thanh Huy | Logic Agent |
+| 24120390 | Hồ Hữu Nghiêm | Validator và thực nghiệm |
+| 24120379 | Chu Bảo Minh | Core Game, điều phối báo cáo và video demo |
+| 24120304 | Trần Thị Bích Hạnh | DPLL SAT Solver |
+| 24120427 | Võ Trúc Quỳnh | CNF Encoder |
+
 ## 1. Yêu cầu hệ thống
 
 - Python 3.10 trở lên.
@@ -61,6 +71,26 @@ Có thể mở trực tiếp một màn chơi bằng:
 ```bash
 python main.py --puzzle puzzles/level_4x4_hard.json
 ```
+
+### Chạy giao diện trên Ubuntu/WSL
+
+Trên Ubuntu hoặc WSL có hỗ trợ ứng dụng đồ họa, mở terminal tại thư mục
+gốc của repo. Nếu Python hệ thống báo `No module named 'tkinter'`,
+cài Tkinter bằng lệnh sau:
+
+```bash
+sudo apt install python3-tk
+```
+
+Khởi chạy trò chơi bằng Python hệ thống:
+
+```bash
+cd Source
+/usr/bin/python3 main.py
+```
+
+Để kiểm tra giao diện, chọn **3×3 Easy** rồi nhấn **BẮT ĐẦU**.
+Bàn chơi sẽ hiện với thẻ **A1** đã mở.
 
 ## 3. Điều khiển trò chơi
 
@@ -123,35 +153,66 @@ Chương trình có 9 màn được lưu trong thư mục `puzzles/`.
 
 Hai màn Easy dùng để làm quen với trò chơi. Các màn Medium và Hard kết hợp nhiều loại manh mối, yêu cầu suy luận qua nhiều bước.
 
-Các màn nâng cao đã được kiểm chứng độc lập về nghiệm duy nhất và khả năng giải không đoán; cần kiểm thử lại bằng Logic Agent chính thức sau khi hoàn thiện.
+Cả 9 màn đều có nghiệm duy nhất khi kiểm tra toàn bộ manh mối. Từ trạng thái công khai ban đầu, Logic Agent giải được cả 9 màn mà không cần đoán.
 
 ## 6. Kiểm thử và thực nghiệm
 
-Mở terminal tại thư mục `Source`.
+Các lệnh dưới đây chạy từ thư mục `Source`, trong môi trường Python đã cài
+`requirements.txt` theo mục 2. Nếu đang ở thư mục gốc của repo, chạy `cd Source` trước.
 
-Kiểm thử toàn bộ chương trình:
+### 6.1. Chạy kiểm thử
+
+Chạy toàn bộ bộ test:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-Kiểm thử riêng Logic Agent:
+Chạy riêng các test trong `test_logic_agent.py`:
 
 ```bash
 python -m unittest tests.test_logic_agent -v
 ```
 
-Các chỉ số cần ghi nhận khi thực nghiệm gồm:
+### 6.2. Chạy thực nghiệm trên Ubuntu/WSL
 
-- Primary Variables và Auxiliary Variables.
-- CNF Clauses.
-- SAT Calls.
-- Decisions, Propagations và Backtracks.
-- Deduction Steps.
-- Runtime.
-- Trạng thái kết thúc: SOLVED, STUCK hoặc INCONSISTENT.
+```bash
+python -m experiments.run_experiments
+```
 
-Kết quả thực nghiệm được tổng hợp sau khi CNF Encoder, DPLL và Logic Agent hoàn thiện.
+Chương trình chạy 9 màn, mỗi màn 5 lượt, giới hạn 30 giây/lượt.
+Cuối quá trình, terminal hiển thị số lượt hoàn tất, số lượt hết giờ và số lỗi.
+Các file kết quả được cập nhật trong `experiments/results/`.
+
+| File | Nội dung |
+|---|---|
+| `experiment_runs.csv` | Số liệu từng lượt chạy |
+| `experiment_summary.csv` | Tổng hợp theo màn, gồm kết quả kiểm tra nghiệm duy nhất |
+| `experiment_size_summary.csv` | Tổng hợp theo kích thước bàn 3×3, 4×4 và 5×5 |
+| `experiment_results.json` | Kết quả thực nghiệm ở định dạng JSON |
+
+### 6.3. Tạo bảng và biểu đồ
+
+Sau khi chạy thực nghiệm, chạy tiếp:
+
+```bash
+python -m experiments.plot_results
+```
+
+Lệnh này đọc số liệu vừa ghi và tạo [bảng kết quả](Source/experiments/results/report_results_tables.md)
+cùng 10 [biểu đồ PNG](Source/experiments/results/figures/).
+Bảng ghi số biến chính/phụ, số mệnh đề CNF, số lần gọi SAT, decisions,
+propagations, backtracks, số bước suy luận và thời gian giải.
+
+Khi cập nhật báo cáo trên Ubuntu/WSL, chạy hai lệnh sau từ `Source`
+(máy cần có `latexmk` và XeLaTeX):
+
+```bash
+cp experiments/results/figures/*.png ../report/figures/
+(cd ../report && latexmk -xelatex -interaction=nonstopmode -halt-on-error main.tex)
+```
+
+PDF sau khi biên dịch nằm tại [report/main.pdf](report/main.pdf).
 
 ## 7. Cấu trúc mã nguồn
 
@@ -164,7 +225,6 @@ Source/
 ├── regions.py
 ├── semantics.py
 ├── requirements.txt
-├── README.md
 ├── algorithm/
 │   ├── __init__.py
 │   ├── encoder.py
@@ -190,9 +250,14 @@ Source/
 │   └── level_5x5_hard.json
 ├── tests/
 │   ├── test_core.py
+│   ├── test_deduction.py
+│   ├── test_dpll.py
+│   ├── test_encoder.py
 │   └── test_logic_agent.py
 └── experiments/
-    └── run_experiments.py
+    ├── run_experiments.py
+    ├── plot_results.py
+    └── results/
 ```
 
 Chức năng các thành phần:
@@ -205,7 +270,7 @@ Chức năng các thành phần:
 - `algorithm/`: CNF Encoder, DPLL Solver, Logic Agent và Validator.
 - `gui/`: Giao diện trang chủ, chọn màn, luật chơi và bàn cờ.
 - `puzzles/`: Dữ liệu JSON của 9 màn chơi.
-- `tests/`: Kiểm thử Core Game và Logic Agent.
+- `tests/`: Kiểm thử game, encoder, DPLL và Logic Agent.
 - `experiments/`: Thực hiện các thí nghiệm đánh giá thuật toán.
 
 ## 8. Trạng thái và thông tin dự án
@@ -222,9 +287,9 @@ Chức năng các thành phần:
 
 **Trạng thái hiện tại:**
 
-- Core Game, GUI và dữ liệu màn chơi đã được xây dựng.
-- Chương trình đã chuyển sang sử dụng `LogicAgent` chính thức.
-- CNF Encoder, DPLL Solver, Logic Agent và Validator đang được các thành viên tiếp tục triển khai.
-- Các thao tác suy luận chưa thể hoạt động đầy đủ trước khi tích hợp xong thuật toán.
+- Game đã tích hợp CNF Encoder, DPLL SAT Solver, Logic Agent và Validator.
+- Nhóm đã chạy thành công 48/48 unit test trên Ubuntu.
+- Trong đợt thực nghiệm được trình bày ở chương 7, cả 9 màn đều có nghiệm duy nhất.
+  Agent giải xong 45/45 lượt, không có lỗi hoặc lượt hết giờ.
 
 Các thành viên cần giữ nguyên hợp đồng API trong `models.py` và bảo đảm Agent không truy cập thông tin ẩn của Game Engine.
