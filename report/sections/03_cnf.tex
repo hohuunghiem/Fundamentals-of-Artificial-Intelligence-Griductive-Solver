@@ -1,16 +1,263 @@
 \section{Chuyển đổi manh mối sang CNF}
+\label{sec:cnf}
+
 \subsection{Ánh xạ biến}
-% Mô tả cách ánh xạ cell sang integer variable theo thứ tự row-major.
+\textbf{Công thức.} Hàm \texttt{build\_var\_map(size)} gán cho mỗi ô một biến
+chính theo thứ tự hàng (row-major):
+\[
+\mathrm{var}(x) = (\mathit{row}(x) - 1)\cdot N + \mathit{col}(x),
+\]
+trong đó cột A có $\mathit{col} = 1$. Trên bàn $3\times3$: A1 $\mapsto 1$,
+B1 $\mapsto 2$, C1 $\mapsto 3$, A2 $\mapsto 4$, \ldots, C3 $\mapsto 9$. Bàn
+$N\times N$ có đúng $N^2$ biến chính, đánh số liên tục từ 1 đến $N^2$.
+
+\textbf{Tính tất định.} Ánh xạ chỉ phụ thuộc kích thước bàn, không phụ thuộc
+thứ tự manh mối hay thứ tự mở thẻ, nên cùng một ô luôn ứng với cùng một biến
+ở mọi bước $t$. \texttt{encode\_clue} kiểm tra lại điều này và báo lỗi nếu
+nhận một ánh xạ khác ánh xạ chuẩn.
+
+\textbf{Biến phụ.} Encoder dùng mã hóa tổ hợp trực tiếp (mục~\ref{sec:cnf-count})
+nên không sinh biến phụ: \texttt{aux\_count} $= 0$ và
+\texttt{num\_vars} $=$ \texttt{primary\_count} $= N^2$. Nếu sau này đổi sang
+một mã hóa có biến phụ, các biến này được đánh số từ $N^2+1$ để tách biệt với
+biến chính.
+
+\textbf{Giải vùng.} Trước khi mã hóa manh mối đếm, \texttt{resolve\_region}
+đổi mô tả vùng thành danh sách ô theo thứ tự hàng, mỗi ô xuất hiện một lần:
+\begin{itemize}
+    \item \texttt{ROW}, \texttt{COLUMN}: mọi ô cùng số hàng hoặc cùng chữ cột.
+    \item \texttt{NEIGHBORS}: thử 8 hướng $(\Delta r,\Delta c)\ne(0,0)$, bỏ các
+    ô ra ngoài bàn. Ô trong có 8 hàng xóm, ô cạnh có 5, ô góc có 3.
+    \item \texttt{CELLS}: danh sách ô tường minh; ô trùng hoặc ô không tồn tại
+    bị báo \texttt{ValueError}, không âm thầm sửa.
+    \item \texttt{CORNERS} (mở rộng 1): bốn ô góc A1, $X$1, A$N$, $XN$ với $X$
+    là cột cuối.
+    \item \texttt{COMMON\_NEIGHBORS} (mở rộng 2): giao hai tập hàng xóm của
+    hai ô khác nhau. Ví dụ trên bàn $3\times3$, hàng xóm chung của A1 và C1
+    là $\{\text{B1},\text{B2}\}$.
+\end{itemize}
+
+\textbf{Kiểm tra đầu vào.} Encoder dùng chung các hàm kiểm tra với semantic
+evaluator nên quy tắc chỉ viết ở một chỗ. Các lỗi bị từ chối gồm: ô không tồn
+tại; \texttt{criminal} không phải Boolean; SAME/DIFFERENT không có đúng 2 ô
+khác nhau; $k$ không phải số nguyên, là \texttt{bool} (vì trong Python
+\texttt{True} cũng là \texttt{int}) hoặc nằm ngoài $[0, |R|]$; trạng thái đã
+biết không phải Boolean. Mọi lỗi được báo bằng \texttt{ValueError}, không bị
+coi là \texttt{UNKNOWN}.
+
 \subsection{Mã hóa FACT}
-% Trình bày unit clause cho trạng thái True/False.
+Manh mối FACT khẳng định trạng thái của một ô $x$, nên được mã hóa thành một
+unit clause:
+\begin{align*}
+\text{FACT}(x,\text{Criminal}) &\;\equiv\; C_x \;\mapsto\; \texttt{[[}\mathrm{var}(x)\texttt{]]},\\
+\text{FACT}(x,\text{Innocent}) &\;\equiv\; \neg C_x \;\mapsto\; \texttt{[[}-\mathrm{var}(x)\texttt{]]}.
+\end{align*}
+Ví dụ: ``B1 là tội phạm'' cho \texttt{[[2]]}, ``A1 vô tội'' cho \texttt{[[-1]]}.
+Trạng thái đã được chứng minh trong \texttt{known\_statuses} được thêm vào KB
+theo đúng cách này.
+
 \subsection{Mã hóa SAME và DIFFERENT}
-% Dẫn xuất hai clause cho equivalence và XOR.
+\textbf{SAME.} Hai người $a$, $b$ cùng trạng thái nghĩa là $C_a \leftrightarrow C_b$.
+Dẫn xuất CNF:
+\begin{align*}
+C_a \leftrightarrow C_b
+&\equiv (C_a \rightarrow C_b) \wedge (C_b \rightarrow C_a) && \text{(định nghĩa tương đương)}\\
+&\equiv (\neg C_a \vee C_b) \wedge (C_a \vee \neg C_b) && \text{(}p \rightarrow q \equiv \neg p \vee q\text{)}
+\end{align*}
+Kết quả là 2 mệnh đề \texttt{[[-a, b], [a, -b]]}.
+
+\textbf{DIFFERENT.} Hai người khác trạng thái nghĩa là $C_a \oplus C_b$, tức
+``ít nhất một người là tội phạm'' và ``không phải cả hai đều là tội phạm'':
+\begin{align*}
+C_a \oplus C_b
+&\equiv (C_a \vee C_b) \wedge \neg(C_a \wedge C_b)\\
+&\equiv (C_a \vee C_b) \wedge (\neg C_a \vee \neg C_b) && \text{(De Morgan)}
+\end{align*}
+Kết quả là \texttt{[[a, b], [-a, -b]]}.
+
+\textbf{Kiểm tra bằng bảng chân trị.} Với A1 $=1$, C3 $=9$:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccccc}
+\toprule
+$C_1$ & $C_9$ & $\neg C_1 \vee C_9$ & $C_1 \vee \neg C_9$ & SAME & DIFFERENT \\
+\midrule
+F & F & T & T & T & F \\
+F & T & T & F & F & T \\
+T & F & F & T & F & T \\
+T & T & T & T & T & F \\
+\bottomrule
+\end{tabular}
+\caption{Bảng chân trị của SAME(A1, C3) và DIFFERENT(A1, C3)}
+\end{table}
+
+Phép AND của hai cột giữa đúng bằng cột SAME, xác nhận phép biến đổi.
+
 \subsection{Mã hóa ràng buộc số lượng}
+\label{sec:cnf-count}
+Cho vùng $R$ có $n$ ô với các biến $x_1,\dots,x_n$ và số nguyên
+$0 \le k \le n$. Vì các vùng bắt buộc đều nhỏ (một hàng tối đa 5 ô, tập hàng
+xóm tối đa 8 ô), nhóm dùng mã hóa tổ hợp trực tiếp (binomial encoding),
+được hàm \texttt{combinations} của \texttt{itertools} sinh tự động.
+
 \subsubsection{AT-MOST}
-% Giải thích encoding tổ hợp được dùng trong encoder.py.
+\textbf{Ý tưởng.} ``Có nhiều nhất $k$ tội phạm'' tương đương ``không tồn tại
+$k+1$ người cùng là tội phạm''. Với mỗi tập con $S \subseteq R$ có $|S| = k+1$,
+cấm $\bigwedge_{i\in S} x_i$; theo De Morgan,
+$\neg\bigwedge_{i\in S} x_i \equiv \bigvee_{i\in S}\neg x_i$. Do đó:
+\[
+\textstyle\sum_{i\in R} x_i \le k
+\;\equiv\;
+\bigwedge_{S\subseteq R,\;|S|=k+1}\;\bigvee_{i\in S}\neg x_i .
+\]
+Hàm \texttt{at\_most(vars, k)} sinh $\binom{n}{k+1}$ mệnh đề, mỗi mệnh đề gồm
+$k+1$ literal âm.
+
+\textbf{Tính đúng.} Nếu có nhiều hơn $k$ biến True thì chọn $k+1$ biến trong
+số đó được một tập $S$ có mệnh đề tương ứng sai. Ngược lại nếu tối đa $k$ biến
+True thì mọi tập $S$ cỡ $k+1$ đều chứa ít nhất một biến False, làm mệnh đề
+của $S$ đúng.
+
+\textbf{Ví dụ.} AT\_MOST 1 trong hàng 1 của bàn $3\times3$, $R=\{1,2,3\}$.
+Các tập con 2 phần tử là $\{1,2\},\{1,3\},\{2,3\}$, cho 3 mệnh đề:
+\[
+(\neg C_1 \vee \neg C_2) \wedge (\neg C_1 \vee \neg C_3) \wedge (\neg C_2 \vee \neg C_3)
+\;\mapsto\; \texttt{[[-1,-2], [-1,-3], [-2,-3]]}.
+\]
+
 \subsubsection{AT-LEAST}
-% Giải thích encoding thực tế.
+\textbf{Ý tưởng.} ``Có ít nhất $k$ tội phạm'' tương đương ``có nhiều nhất
+$n-k$ người vô tội'', tức không tồn tại $n-k+1$ người cùng vô tội. Với mỗi
+tập con $S$ có $|S| = n-k+1$, phải có ít nhất một người trong $S$ là tội phạm:
+\[
+\textstyle\sum_{i\in R} x_i \ge k
+\;\equiv\;
+\bigwedge_{S\subseteq R,\;|S|=n-k+1}\;\bigvee_{i\in S} x_i .
+\]
+Hàm \texttt{at\_least(vars, k)} sinh $\binom{n}{n-k+1} = \binom{n}{k-1}$ mệnh
+đề toàn literal dương. Trường hợp $k=0$ luôn đúng nên trả về \texttt{[]}.
+
+\textbf{Ví dụ.} AT\_LEAST 2 trên $R = \{1,2,3\}$: $n-k+1 = 2$, cho
+\texttt{[[1,2], [1,3], [2,3]]}. Nếu chỉ có một tội phạm, chẳng hạn $C_1$, thì
+mệnh đề \texttt{[2,3]} sai; nếu có từ hai tội phạm trở lên thì mọi cặp đều
+chứa ít nhất một tội phạm.
+
 \subsubsection{EXACTLY}
-% Kết hợp AT-MOST và AT-LEAST.
+$\sum x_i = k$ tương đương $\sum x_i \le k$ và $\sum x_i \ge k$, nên
+\texttt{EXACTLY} là phép nối hai danh sách
+\texttt{at\_most(vars, k) + at\_least(vars, k)}. Ví dụ EXACTLY 1 trên
+$\{1,2,3\}$ gồm 3 mệnh đề cặp âm của AT\_MOST 1 và mệnh đề \texttt{[1,2,3]}
+của AT\_LEAST 1, tổng cộng 4 mệnh đề. Manh mối ``NO'' (không có tội phạm nào)
+được biểu diễn bằng EXACTLY 0, khi đó encoder sinh một unit clause âm cho
+mỗi ô trong vùng.
+
+\textbf{Các trường hợp biên.}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{lYl}
+\toprule
+Trường hợp & Kết quả & CNF \\
+\midrule
+AT\_MOST $n$ & Không có tập con cỡ $n+1$ nên luôn đúng & \texttt{[]} \\
+AT\_MOST 0 & Mọi ô vô tội & $n$ unit clause âm \\
+AT\_LEAST 0 & Luôn đúng & \texttt{[]} \\
+AT\_LEAST $n$ & Tập con cỡ 1, mọi ô là tội phạm & $n$ unit clause dương \\
+Vùng rỗng, $k=0$ & Mọi điều kiện đếm đúng & \texttt{[]} \\
+\bottomrule
+\end{tabularx}
+\caption{Các trường hợp biên của ràng buộc đếm}
+\end{table}
+
+\textbf{Số mệnh đề.} Với một vùng $n$ ô, EXACTLY $k$ sinh
+$\binom{n}{k+1} + \binom{n}{k-1}$ mệnh đề. Trường hợp xấu nhất trong các vùng
+bắt buộc là tập hàng xóm 8 ô với $k=4$: $\binom{8}{5}+\binom{8}{3} = 112$ mệnh
+đề, vẫn nhỏ. Bảng dưới là tổng số mệnh đề khi mã hóa toàn bộ manh mối của
+từng màn trong bộ dữ liệu.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Màn & Kích thước & Biến chính & Biến phụ & Số mệnh đề \\
+\midrule
+\texttt{demo\_3x3} & $3\times3$ & 9 & 0 & 15 \\
+\texttt{level\_3x3\_medium\_01} & $3\times3$ & 9 & 0 & 57 \\
+\texttt{level\_3x3\_medium\_02} & $3\times3$ & 9 & 0 & 46 \\
+\texttt{demo\_4x4} & $4\times4$ & 16 & 0 & 16 \\
+\texttt{level\_4x4\_medium} & $4\times4$ & 16 & 0 & 118 \\
+\texttt{level\_4x4\_hard} & $4\times4$ & 16 & 0 & 88 \\
+\texttt{level\_5x5\_medium} & $5\times5$ & 25 & 0 & 203 \\
+\texttt{level\_5x5\_medium\_02} & $5\times5$ & 25 & 0 & 233 \\
+\texttt{level\_5x5\_hard} & $5\times5$ & 25 & 0 & 357 \\
+\bottomrule
+\end{tabular}
+\caption{Kích thước CNF khi mã hóa toàn bộ manh mối của mỗi màn}
+\end{table}
+
+\textbf{Hạn chế.} Số mệnh đề của mã hóa tổ hợp tăng theo hệ số nhị thức. Với
+vùng \texttt{CELLS} lớn, ví dụ EXACTLY 12 trên cả 25 ô của bàn $5\times5$,
+encoder sẽ sinh $\binom{25}{13}+\binom{25}{11} \approx 9{,}66$ triệu mệnh đề.
+Bộ dữ liệu của nhóm không có vùng như vậy. Nếu cần hỗ trợ, có thể thay bằng
+mã hóa sequential counter của Sinz~(2005), dùng $O(nk)$ mệnh đề và $O(nk)$
+biến phụ.
+
+\subsection{Xây dựng Knowledge Base}
+Hàm \texttt{encode(public\_state)} xây $KB_t$ tại bước $t$:
+\[
+KB_t = \bigwedge_{c\,\in\,\text{revealed\_clues}} \mathrm{CNF}(c)
+\;\wedge\; \bigwedge_{x\,\in\,\text{known\_statuses}} \ell_x,
+\]
+trong đó $\ell_x = C_x$ nếu $x$ đã được chứng minh là Criminal và
+$\ell_x = \neg C_x$ nếu Innocent.
+\begin{enumerate}
+    \item Kiểm tra \texttt{public\_state} có đúng kiểu: \texttt{revealed\_clues}
+    là \texttt{list}, \texttt{known\_statuses} là \texttt{dict}.
+    \item Tạo ánh xạ biến bằng \texttt{build\_var\_map}.
+    \item Với mỗi manh mối đã mở, gọi \texttt{encode\_clue} và nối các mệnh
+    đề vào KB.
+    \item Với mỗi trạng thái đã chứng minh, thêm một unit clause.
+    \item Trả về \texttt{EncodedKB} gồm \texttt{clauses}, \texttt{cell\_to\_var},
+    \texttt{primary\_count}, \texttt{aux\_count}, \texttt{num\_vars} và
+    \texttt{clause\_count}.
+\end{enumerate}
+
+\textbf{Không rò rỉ thông tin ẩn.} \texttt{encode} chỉ nhận
+\texttt{PublicState}, không nhận \texttt{PuzzleData} hay đối tượng Engine, và
+chỉ đọc hai trường \texttt{revealed\_clues} và \texttt{known\_statuses}. Vì vậy
+đáp án ẩn và các manh mối chưa mở không thể lọt vào $KB_t$. KB được xây lại
+từ đầu ở mỗi bước, nên các giả định tạm của truy vấn trước ($\neg C_i$ hoặc
+$C_i$) không bị giữ lại.
+
+\textbf{Ví dụ.} Bàn $3\times3$, A1 đã được chứng minh vô tội và manh mối đã mở
+của A1 là ``đúng 1 tội phạm trong hàng 1''. Khi đó
+\begin{align*}
+KB_t = \;&\underbrace{(\neg C_1\vee\neg C_2)\wedge(\neg C_1\vee\neg C_3)\wedge(\neg C_2\vee\neg C_3)\wedge(C_1\vee C_2\vee C_3)}_{\text{EXACTLY}(1,\ \text{hàng }1)}\\
+&\wedge \underbrace{\neg C_1}_{\text{A1 vô tội}},
+\end{align*}
+tức \texttt{[[-1,-2],[-1,-3],[-2,-3],[1,2,3],[-1]]}, 9 biến chính, 0 biến
+phụ, 5 mệnh đề.
+
 \subsection{Kiểm chứng CNF}
-% Mô tả tests/test_encoder.py và đối chiếu với semantic evaluator.
+\textbf{Semantic evaluator.} Hàm \texttt{evaluate\_clue(clue, assignment, board)}
+trong \texttt{semantics.py} tính trực tiếp giá trị của manh mối trên một phép
+gán đầy đủ, không gọi encoder: FACT so trạng thái ô, SAME/DIFFERENT so hai ô,
+các manh mối đếm thì đếm số ô True trong vùng rồi so với $k$ bằng $=$, $\ge$,
+$\le$. Evaluator cũng được Game Engine dùng để kiểm tra mọi manh mối trong
+file màn đều đúng với đáp án lưu trữ.
+
+\textbf{Kiểm thử tương đương.} \texttt{tests/test\_encoder.py} sinh tập manh
+mối gồm FACT, SAME, DIFFERENT và mọi tổ hợp (loại đếm $\times$ vùng $\times$
+$k$) với các vùng ROW, COLUMN, NEIGHBORS của ô trong và ô góc, CELLS, CORNERS,
+COMMON\_NEIGHBORS. Với mỗi manh mối, test duyệt toàn bộ $2^9 = 512$ phép gán
+của bàn $3\times3$ và kiểm tra
+\[
+\mathrm{CNF}(c)\ \text{đúng dưới phép gán } \alpha
+\;\Longleftrightarrow\;
+\texttt{evaluate\_clue}(c, \alpha) = \text{True}.
+\]
+Vì hai cài đặt được viết độc lập, sự trùng khớp trên mọi phép gán chứng tỏ CNF
+tương đương logic với ngữ nghĩa của manh mối. Test cũng kiểm tra các đầu vào
+sai (ô ngoài bàn, $k$ vượt cỡ vùng, $k$ là \texttt{bool}, SAME với hai ô trùng,
+trạng thái không phải Boolean) đều bị báo \texttt{ValueError}. Toàn bộ test
+encoder đều qua.
