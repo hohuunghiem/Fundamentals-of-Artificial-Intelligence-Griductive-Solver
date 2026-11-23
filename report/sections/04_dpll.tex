@@ -1,11 +1,239 @@
 \section{Thuật toán DPLL}
-\subsection{Tổng quan}
-% Trình bày DPLL và đầu vào CNF, đầu ra SAT/UNSAT.
+\label{sec:dpll}
+
+\subsection{Vai trò và giao diện}
+DPLL (Davis--Putnam--Logemann--Loveland) là thuật toán đệ quy tìm một phép
+gán thỏa mãn công thức propositional ở dạng CNF. Đây là lõi suy diễn của
+Logic Agent: ngoài một query cơ sở trên $KB_t$, khi $KB_t$ thỏa mãn
+(\texttt{SAT}), với mỗi nhân vật $i$ chưa được giải, agent thực hiện cả hai
+query DPLL trên $KB_t\wedge\neg C_i$ và $KB_t\wedge C_i$; nếu một trong hai
+là \texttt{UNSAT} thì verdict tương ứng được suy ra (xem phần nguyên lý
+entailment ở mục Logic Agent), nếu cả hai là \texttt{SAT} thì trạng thái là
+\texttt{UNKNOWN}. Khi chọn nước đi tiếp theo, agent dừng sớm ngay khi tìm
+được nhân vật đầu tiên có verdict suy ra được. Cách này đảm bảo agent không
+bao giờ đoán. Bộ kiểm tra nghiệm duy nhất (trình bày ở mục Logic Agent) cũng
+dùng chung bộ giải này.
+
+Bộ giải nằm tại \texttt{Source/algorithm/dpll.py} và được gọi qua
+\texttt{solve(clauses, num\_vars)}. Mỗi literal nguyên dương $i$ biểu diễn
+$x_i$ và $-i$ biểu diễn $\neg x_i$; một mệnh đề là danh sách literal và CNF
+là danh sách mệnh đề. Hàm \texttt{solve()} không tham chiếu đến ô bàn cờ,
+tên nhân vật hay giao diện người dùng, nên có thể tái sử dụng độc lập.
+Assumption như $\neg C_i$ được thêm dưới dạng một unit clause tạm thời vào
+\emph{bản sao} của CNF, nên $KB_t$ gốc không bị thay đổi.
+
+Đầu ra là một \texttt{SATResult} thuộc một trong hai trường hợp:
+\begin{itemize}
+    \item \texttt{SAT}: kèm assignment chứa giá trị Boolean của đầy đủ các
+    biến $1,\ldots,\texttt{num\_vars}$;
+    \item \texttt{UNSAT}: không có phép gán thỏa mãn, assignment là
+    \texttt{None}.
+\end{itemize}
+Trước khi tìm kiếm, \texttt{solve()} kiểm tra \texttt{num\_vars} (phải là số
+nguyên không âm, không phải \texttt{bool}), kiểu \texttt{list} của danh sách
+mệnh đề và từng mệnh đề, cùng tính hợp lệ của từng literal. Literal bằng $0$,
+có giá trị tuyệt đối nằm ngoài khoảng $1,\ldots,\texttt{num\_vars}$ hoặc
+không phải số nguyên (kể cả \texttt{bool}) bị báo \texttt{ValueError}. Các
+mệnh đề được sao sang danh sách mới trước khi giải nên CNF gốc không bị sửa.
+
+\subsection{Mã giả}
+Hàm \texttt{\_search()} trả về giá trị Boolean, còn \texttt{solve()} đóng
+gói kết quả thành \texttt{SATResult}. Trong mã giả dưới đây,
+\texttt{PROPAGATE} tương ứng với \texttt{\_propagate()} và sửa
+\texttt{assignment} tại chỗ; \texttt{DPLL} tương ứng với \texttt{\_search()}.
+
+\begin{lstlisting}[caption={Mã giả DPLL sử dụng trong chương trình}]
+DPLL(CNF, assignment):
+    if PROPAGATE(CNF, assignment) is CONFLICT:
+        return UNSAT
+
+    if all_variables_are_assigned():
+        return SAT if every_clause_is_satisfied() else UNSAT
+
+    v = smallest_unassigned_variable()
+    decisions += 1
+
+    for value in (TRUE, FALSE):
+        branch = copy(assignment)
+        branch[v] = value
+        if DPLL(CNF, branch) is SAT:
+            assignment <- branch
+            return SAT
+        backtracks += 1
+
+    return UNSAT
+\end{lstlisting}
+
+Chiến lược chọn biến và thứ tự phân nhánh hoàn toàn xác định: biến được chọn
+là biến chưa gán có chỉ số nhỏ nhất, nhánh \texttt{True} được thử trước và
+nhánh \texttt{False} chỉ được thử sau khi nhánh \texttt{True} thất bại. Mỗi
+nhánh làm việc trên một bản sao assignment của nhánh cha nên trạng thái các
+nhánh không ảnh hưởng lẫn nhau. Do đó kết quả và thống kê được tái lập giữa
+các lần chạy.
+
 \subsection{Unit propagation}
-% Giải thích lan truyền mệnh đề đơn.
+Unit propagation được thực hiện trong \texttt{\_propagate()}. Với phép gán
+hiện tại, hàm duyệt từng mệnh đề và xử lý ba trường hợp chính (nếu mệnh đề
+chưa thỏa và còn từ hai literal chưa gán trở lên thì giữ nguyên cho các lượt
+sau):
+\begin{enumerate}
+    \item mệnh đề chứa ít nhất một literal có giá trị \texttt{True}: mệnh đề
+    đã thỏa, bỏ qua;
+    \item không có literal thỏa và có đúng một literal chưa gán: đây là unit
+    clause;
+    \item không có literal thỏa và không còn literal chưa gán: conflict
+    (Mục~\ref{sec:dpll-conflict}).
+\end{enumerate}
+Ở trường hợp thứ hai, literal duy nhất bắt buộc phải \texttt{True}, nên biến
+tương ứng được gán theo dấu của literal (literal $2$ gán $x_2=\texttt{True}$,
+literal $-2$ gán $x_2=\texttt{False}$). Mỗi phép gán mới được tính là một
+\emph{propagation}. Hàm lặp lại các lượt quét cho đến khi không còn phép gán
+mới, vì một phép gán có thể biến các mệnh đề khác thành unit clause.
+
+Xét $F=(x_1)\land(\neg x_1\lor x_2)$. Mệnh đề $[1]$ gán $x_1=\texttt{True}$;
+khi đó $-1$ trong mệnh đề thứ hai nhận giá trị \texttt{False}, chỉ còn
+literal $2$ nên $x_2=\texttt{True}$. Cả hai mệnh đề đều thỏa: kết quả
+\texttt{SAT} với $0$ decision, $2$ propagation, $0$ backtrack.
+
 \subsection{Conflict detection}
-% Giải thích mệnh đề rỗng/chưa thỏa mãn.
+\label{sec:dpll-conflict}
+\texttt{\_propagate()} báo conflict khi tồn tại một mệnh đề mà mọi literal
+đều có giá trị \texttt{False}, tức không còn literal thỏa và không còn
+literal chưa gán (mệnh đề rỗng dưới phép gán hiện tại). Khi đó nhánh hiện tại
+bị cắt ngay và DPLL quay lui.
+
+Ví dụ với $G=(x_1)\land(\neg x_1)$: lượt quét đầu gán $x_1=\texttt{True}$ từ
+$[1]$; ngay sau đó mệnh đề $[-1]$ chỉ có literal $\neg x_1$ nhận giá trị
+\texttt{False} nên bị coi là xung đột, và DPLL trả \texttt{UNSAT} mà không
+cần phân nhánh ($0$ decision, $1$ propagation, $0$ backtrack).
+
+Khi sau propagation không còn biến chưa gán, chương trình còn kiểm tra lại
+từng mệnh đề có ít nhất một literal \texttt{True}. Đây là bước kiểm tra phòng
+vệ: về lý thuyết nó không bao giờ bắt được lỗi, vì một mệnh đề chưa thỏa khi
+mọi biến đã gán đã bị \texttt{\_propagate()} báo conflict.
+
 \subsection{Branching và backtracking}
-% Nêu chính xác chiến lược chọn biến, thứ tự nhánh trong algorithm/dpll.py.
-\subsection{Độ phức tạp và thống kê}
-% Phân tích theo implementation; định nghĩa decisions, propagations, backtracks.
+Sau unit propagation, \texttt{\_search()} liệt kê các biến chưa gán theo thứ
+tự tăng dần và chọn biến nhỏ nhất làm biến phân nhánh; mỗi lần chọn làm tăng
+\texttt{decisions} thêm một. DPLL tạo bản sao assignment, gán biến đó lần lượt
+là \texttt{True} rồi \texttt{False} và gọi đệ quy. Nếu một nhánh trả
+\texttt{SAT}, assignment của nhánh được sao ngược lên nhánh cha và đệ quy dừng.
+Mỗi nhánh thất bại làm tăng \texttt{backtracks} thêm một; do đó một decision
+mà cả hai nhánh đều thất bại sinh ra hai backtrack, và hàm trả \texttt{False}
+cho tầng trên.
+
+Cài đặt hiện tại chỉ dừng với \texttt{SAT} khi \emph{mọi} biến đã được gán,
+kể cả biến không xuất hiện trong ràng buộc nào còn lại; các biến đó vẫn được
+tính là decision (thành công ở nhánh \texttt{True}). Vì vậy khi
+\texttt{\_search()} trả \texttt{True}, assignment đã đầy đủ các biến
+$1,\ldots,\texttt{num\_vars}$, và \texttt{solve()} chỉ sao chép nó thành model
+(giá trị mặc định \texttt{False} chỉ mang tính phòng vệ).
+
+\paragraph{Ví dụ có backtrack.}
+Xét $H=(x_1\lor x_2)\land(\neg x_1\lor x_2)\land(\neg x_1\lor\neg x_2)$.
+DPLL chọn $x_1$ và thử $x_1=\texttt{True}$; propagation gán $x_2=\texttt{True}$
+từ mệnh đề thứ hai, khi đó mệnh đề thứ ba rỗng nên conflict. DPLL quay lui,
+thử $x_1=\texttt{False}$, từ $(x_1\lor x_2)$ suy ra $x_2=\texttt{True}$ và
+mọi mệnh đề đều thỏa. Thống kê: $1$ decision, $2$ propagation, $1$ backtrack.
+
+\subsection{Độ phức tạp}
+Với $n$ biến, $m$ mệnh đề và độ dài mệnh đề lớn nhất $k$, trường hợp xấu nhất
+của DPLL vẫn có thể duyệt cây tìm kiếm cỡ $O(2^n)$. Mỗi lượt quét của
+\texttt{\_propagate()} duyệt toàn bộ $m$ mệnh đề và có thể lặp tối đa $n$
+lượt (không dùng watched literals), nên chi phí mỗi nút là $O(n\cdot m\cdot k)$.
+Mỗi tầng đệ quy giữ một bản sao assignment và danh sách biến chưa gán cỡ tối
+đa $n$, với độ sâu đệ quy tối đa là $n$, nên bộ nhớ ngăn xếp tìm kiếm là
+$O(n^2)$; tính thêm bản sao CNF đầu vào cỡ $O(m\cdot k)$ thì tổng bộ nhớ là
+$O(n^2 + m\cdot k)$. Với lưới $N\le 5$ (tối đa $25$ biến chính) và các vùng
+nhỏ, các chi phí này không đáng kể; trên thực tế unit propagation đã giải
+quyết hầu hết công việc suy diễn trước khi phải phân nhánh.
+
+\subsection{Thống kê ghi nhận}
+Mỗi SAT query có một bộ \texttt{SATStats} riêng:
+\begin{table}[htbp]
+\centering
+\begin{tabularx}{\linewidth}{>{\bfseries}p{32mm}Y}
+\toprule
+Thống kê & Ý nghĩa trong implementation \\
+\midrule
+decisions & Số lần một biến chưa gán được chọn để phân nhánh (bao gồm cả
+biến không còn bị ràng buộc). \\
+propagations & Số phép gán phát sinh do unit propagation, tính cả các phép
+gán nằm trong nhánh sau đó bị bỏ. \\
+backtracks & Số nhánh tìm kiếm thất bại (mỗi nhánh trả UNSAT tính một lần). \\
+runtime\_ms & Thời gian của một lời gọi \texttt{solve()}, đo bằng
+\texttt{perf\_counter()} theo mili giây; đồng hồ chỉ bao quanh lời gọi ngoài
+cùng nên thời gian các tầng đệ quy không bị cộng trùng. \\
+\bottomrule
+\end{tabularx}
+\caption{Các thống kê của DPLL trong một SAT query.}
+\label{tab:dpll-stats}
+\end{table}
+
+Các số liệu nằm trong \texttt{SATResult.stats}; tổng thống kê DPLL của một
+puzzle là tổng qua các SAT query do Logic Agent thực hiện. Trong báo cáo thực
+nghiệm, \texttt{runtime\_ms} của một lượt giải là thời gian wall-clock đo
+quanh toàn bộ quá trình giải, bao gồm Logic Agent, controller và engine, chứ
+không phải tổng riêng \texttt{runtime\_ms} của các query DPLL.
+
+Bảng~\ref{tab:dpll-examples} cho thống kê của các ví dụ trên (trace đúng theo
+code); ví dụ bốn mệnh đề cho thấy backtracking thực sự hoạt động.
+
+\begin{table}[htbp]
+\centering
+\begin{tabularx}{\linewidth}{Ycccc}
+\toprule
+Công thức & decisions & propagations & backtracks & Kết quả \\
+\midrule
+$F=(x_1)\land(\neg x_1\lor x_2)$ & 0 & 2 & 0 & SAT \\
+$G=(x_1)\land(\neg x_1)$ & 0 & 1 & 0 & UNSAT \\
+$H$ (ba mệnh đề, như trên) & 1 & 2 & 1 & SAT \\
+$(x_1\lor x_2)\land(\neg x_1\lor x_2)\land(x_1\lor\neg x_2)\land(\neg x_1\lor\neg x_2)$
+  & 1 & 2 & 2 & UNSAT \\
+$KB\wedge\neg C_B$, $KB=(C_A\lor C_B)\land(\neg C_A\lor C_B)$ & 0 & 2 & 0 & UNSAT \\
+Công thức rỗng, 3 biến & 3 & 0 & 0 & SAT \\
+\bottomrule
+\end{tabularx}
+\caption{Thống kê DPLL trên các công thức minh họa.}
+\label{tab:dpll-examples}
+\end{table}
+
+\subsection{Kiểm thử cài đặt}
+Các test nằm trong \texttt{Source/tests/test\_dpll.py}, kiểm tra lần lượt:
+\begin{itemize}
+    \item $[1]\land[-1\lor2]$ trả SAT và assignment đầy đủ;
+    \item $[1]\land[-1]$ trả UNSAT;
+    \item công thức rỗng với ba biến trả SAT;
+    \item mệnh đề rỗng trả UNSAT;
+    \item công thức không thỏa ở mọi tổ hợp giá trị của hai biến, solver vẫn
+    ghi nhận decisions và backtracks;
+    \item danh sách mệnh đề đầu vào không bị thay đổi;
+    \item literal bằng $0$, ngoài miền biến hoặc không phải số nguyên bị báo
+    \texttt{ValueError}.
+\end{itemize}
+
+\subsection{Nhận xét và hạn chế}
+Trong 45 lượt giải tuần tự của Logic Agent trên bộ puzzle, tổng số backtrack
+bằng 0. Vì mỗi decision mà cả hai nhánh đều thất bại sinh ra hai backtrack,
+kết quả này cho thấy mọi truy vấn UNSAT trong quá trình giải đều bị phát hiện
+ngay bằng unit propagation ở mức gốc, còn mọi decision của các truy vấn SAT
+đều thành công ngay ở nhánh \texttt{True} đầu tiên. Trong khi đó, ở bước kiểm
+tra nghiệm duy nhất trên toàn bộ tập manh mối (không kèm trạng thái mở ban
+đầu), DPLL vẫn kích hoạt backtracking trên 5/9 puzzle (tối đa 4 backtrack ở
+truy vấn chặn nghiệm của \texttt{level\_5x5\_hard}); cơ chế này cũng được
+kiểm chứng riêng bằng ví dụ bốn mệnh đề ở Bảng~\ref{tab:dpll-examples}.
+
+Các hạn chế của cài đặt:
+\begin{itemize}
+    \item không có pure-literal elimination, không học mệnh đề (CDCL) và
+    heuristic chọn biến chỉ là chọn chỉ số nhỏ nhất;
+    \item không có dừng sớm khi mọi mệnh đề đã thỏa, nên \texttt{decisions}
+    gồm cả các quyết định trên biến không còn bị ràng buộc và lớn hơn số
+    quyết định thực sự cần thiết; điều này không ảnh hưởng tính đúng đắn của
+    kết quả SAT/UNSAT;
+    \item \texttt{\_propagate()} quét lại toàn bộ mệnh đề ở mỗi lượt thay vì
+    dùng watched literals;
+    \item trong 45 lượt giải tuần tự của Logic Agent, bộ puzzle hiện tại chưa
+    có ca nào kích hoạt backtrack, nên hiệu quả của backtracking trong quá
+    trình suy luận theo từng bước trên puzzle thật chưa được đánh giá đầy đủ.
+\end{itemize}
