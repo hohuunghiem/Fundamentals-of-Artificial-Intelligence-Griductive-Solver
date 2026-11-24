@@ -1,15 +1,187 @@
 \section{Logic Agent}
-\subsection{Nguyên lý suy luận dựa trên entailment}
+\label{sec:logic-agent}
+
+\subsection{Thông tin công khai và cơ sở tri thức}
+
+\texttt{LogicAgent} trong \texttt{algorithm/agent.py} xác định trạng thái của
+nhân vật bằng CNF Encoder và DPLL. Tại bước $t$, Game Engine cung cấp một
+bản sao \texttt{PublicState}. Encoder đọc kích thước bàn \texttt{size},
+các trạng thái đã xác nhận \texttt{known\_statuses} và các manh mối đã mở
+\texttt{revealed\_clues} để xây dựng $KB_t$ theo mục~\ref{sec:cnf}. Mỗi ô
+$x$ tương ứng với một biến $C_x$, đúng khi nhân vật là tội phạm và sai khi
+nhân vật vô tội. Trạng thái đã biết được đưa vào $KB_t$ dưới dạng mệnh đề
+đơn $C_x$ hoặc $\neg C_x$. Đáp án đầy đủ và manh mối của các thẻ chưa mở
+được giữ trong Game Engine.
+
+\subsection{Suy diễn bằng truy vấn SAT}
+
+Agent kiểm tra $KB_t$ trước khi xét từng ô. Nếu công thức gốc vô nghiệm,
+Agent trả \texttt{INCONSISTENT}. Kiểm tra này cần thiết vì khi tập mô hình
+của $KB_t$ rỗng, cả hai công thức bổ sung $KB_t \land C_x$ và
+$KB_t \land \neg C_x$ đều vô nghiệm.
+
+Khi $KB_t$ khả thỏa, Agent xét hai giả định đối lập theo thứ tự $\neg C_x$
+rồi $C_x$. Với một literal $\ell$, hàm \texttt{\_query} nối mệnh đề đơn
+$[\ell]$ vào danh sách mệnh đề của $KB_t$ và gọi \texttt{solve}. Mỗi truy vấn
+dùng một danh sách mệnh đề riêng, do đó các giả định chỉ có hiệu lực trong
+lần gọi tương ứng. Kết luận dựa trên phép phản chứng:
+\begin{align*}
+KB_t \models C_x
+ &\iff KB_t \land \neg C_x \text{ vô nghiệm},\\
+KB_t \models \neg C_x
+ &\iff KB_t \land C_x \text{ vô nghiệm}.
+\end{align*}
+Chẳng hạn, nếu $KB_t \land \neg C_x$ vô nghiệm thì mọi mô hình của $KB_t$
+đều gán $C_x$ đúng. Nếu cả hai truy vấn đều trả \texttt{SAT}, có ít nhất một
+mô hình cho mỗi trạng thái của $x$ và dữ kiện hiện tại chưa đủ để kết luận.
+Với $KB_t$ khả thỏa, ít nhất một trong hai truy vấn phải trả \texttt{SAT}.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{cccc}
+\toprule
+$KB_t$ & $KB_t\land\neg C_x$ & $KB_t\land C_x$ & Phân loại \\
+\midrule
+\texttt{UNSAT} & -- & -- & \texttt{INCONSISTENT} \\
+\texttt{SAT} & \texttt{UNSAT} & \texttt{SAT} & \texttt{CRIMINAL} \\
+\texttt{SAT} & \texttt{SAT} & \texttt{UNSAT} & \texttt{INNOCENT} \\
+\texttt{SAT} & \texttt{SAT} & \texttt{SAT} & \texttt{UNKNOWN} \\
+\bottomrule
+\end{tabular}
+\caption{Các kết quả phân loại theo trạng thái của ba truy vấn SAT}
+\label{tab:agent-classification}
+\end{table}
+
+\subsection{Phân loại và chọn nước đi}
+
+\begin{itemize}
+    \item \texttt{classify(public\_state, cell)} mã hóa trạng thái công
+    khai, kiểm tra ô thuộc bàn và phân loại ô đó theo
+    Bảng~\ref{tab:agent-classification}. Ô ngoài bàn gây
+    \texttt{ValueError}.
+    \item \texttt{classify\_all(public\_state)} dùng chung một lần mã hóa
+    và một kết quả kiểm tra $KB_t$ cho toàn bộ các ô chưa biết trạng thái.
+    Hàm trả ánh xạ từ ô sang \texttt{ClassificationResult}.
+    \item \texttt{next\_move(public\_state)} cũng mã hóa một lần và kiểm tra
+    $KB_t$ trước. Khi $KB_t$ khả thỏa, hàm duyệt các ô chưa biết trạng thái
+    theo từng hàng từ trái sang phải, bắt đầu ở hàng trên cùng. Ô
+    \texttt{UNKNOWN} được bỏ qua. Kết luận \texttt{CRIMINAL} hoặc
+    \texttt{INNOCENT} đầu tiên được trả về dưới dạng \texttt{MOVE}, kèm ô và
+    trạng thái đề xuất. Nếu còn ô chưa mở nhưng đã duyệt hết, hàm trả
+    \texttt{STUCK}. Nếu tất cả ô đã mở, hàm trả \texttt{SOLVED}.
+    \texttt{INCONSISTENT} được ưu tiên ngay cả khi mọi ô đã có trạng thái.
+\end{itemize}
+
+Mỗi bản ghi truy vấn chứa danh sách literal giả định, kết quả
+\texttt{SAT}/\texttt{UNSAT} và các thống kê DPLL gồm số lần quyết định,
+lan truyền, quay lui và thời gian chạy. Khi tìm nước đi, Agent lưu truy vấn
+gốc một lần cùng các truy vấn của những ô đã xét, kể cả các ô bị bỏ qua.
+Trường \texttt{relevant\_clue\_ids} trong kết quả phân loại khi $KB_t$ khả
+thỏa và trong kết quả \texttt{MOVE} liệt kê toàn bộ mã manh mối công khai
+tại thời điểm suy luận. Danh sách này ghi lại các tiền đề đang có hiệu lực.
+Việc tìm tập tiền đề tối thiểu nằm ngoài thuật toán hiện tại.
+
+\subsection{Tích hợp với Hint, Auto Solve và mở thẻ}
+
+\texttt{GameController.hint()} gọi \texttt{next\_move} trên trạng thái công
+khai hiện tại. Thao tác này chỉ trả về gợi ý và giữ nguyên trạng thái bàn.
+Mỗi lần chạy \texttt{auto\_step()}, Controller lấy gợi ý rồi gọi
+\texttt{submit} nếu gợi ý có trạng thái \texttt{MOVE}. Người chơi gửi kết
+luận thủ công qua cùng đường kiểm tra.
+
+\texttt{GameEngine.submit\_verdict} kiểm tra ô, giá trị kết luận và việc
+thẻ đã mở hay chưa. Engine gọi lại \texttt{classify} trên trạng thái công
+khai. Nếu Agent trả \texttt{UNKNOWN}, Engine trả \texttt{NOT\_PROVABLE}.
+Nếu kết luận gửi lên trái với trạng thái Agent đã chứng minh, Engine trả
+\texttt{CONTRADICTED}. Nếu $KB_t$ vô nghiệm, Engine trả
+\texttt{INCONSISTENT}. Trong các trường hợp này bàn giữ nguyên. Sau khi
+kết luận đã được suy ra từ $KB_t$, Engine đối chiếu với đáp án lưu trữ để
+phát hiện sai lệch bất thường (\texttt{PUZZLE\_ERROR}). Khi trả
+\texttt{ACCEPTED}, Engine mở đúng thẻ được chọn và công bố trạng thái của
+ô cùng manh mối do thẻ đó sở hữu. Với $c_x$ là manh mối vừa mở và $\ell_x$
+là literal biểu diễn trạng thái đã xác nhận, bước sau dùng cơ sở tri thức
+tương đương với
 \[
-KB \models C_x \iff KB \land \neg C_x \text{ là UNSAT},
-\qquad
-KB \models \neg C_x \iff KB \land C_x \text{ là UNSAT}.
+KB_{t+1} \equiv KB_t \land \ell_x \land \mathrm{CNF}(c_x).
 \]
-\subsection{Phân loại trạng thái}
-% CRIMINAL, INNOCENT, UNKNOWN, INCONSISTENT.
-\subsection{Chọn nước đi và mở clue}
-% Mô tả next_move, classify, classify_all, submit và auto_step.
-\subsection{Kiểm tra nghiệm duy nhất}
-% Mô tả tìm model đầu tiên và blocking clause chỉ trên primary variables.
-\subsection{Giới hạn no-guess}
-% Phân biệt giải tuần tự với việc puzzle có nghiệm duy nhất.
+
+Controller ghi nhật ký cho mỗi nước được chấp nhận, gồm thứ tự bước, mã
+các manh mối đã có trước bước đó, các truy vấn SAT, ô, kết luận và manh mối
+vừa mở. Đối với Auto Solve, nhật ký chứa cả truy vấn tìm nước của
+\texttt{next\_move} và truy vấn xác nhận của \texttt{classify}.
+
+\subsection{Ví dụ trên màn \texttt{demo\_3x3}}
+
+Ban đầu chỉ thẻ A1 mở. Trạng thái công khai xác nhận A1 vô tội và manh mối
+\texttt{clue\_A1} khẳng định B1 là tội phạm. Theo ánh xạ biến của encoder,
+A1 và B1 lần lượt có mã 1 và 2, nên $KB_0$ là \texttt{[[2],[-1]]}.
+\begin{enumerate}
+    \item DPLL trả \texttt{SAT} cho $KB_0$. B1 là ô chưa mở đầu tiên theo
+    thứ tự duyệt.
+    \item Thêm \texttt{[-2]} làm công thức chứa hai mệnh đề đơn đối lập
+    \texttt{[2]} và \texttt{[-2]}, nên DPLL trả \texttt{UNSAT}. Thêm
+    \texttt{[2]} vào $KB_0$ vẫn cho \texttt{SAT}. Agent đề xuất
+    \texttt{MOVE} tại B1 với kết luận \texttt{CRIMINAL}.
+    \item Sau khi Engine chấp nhận, thẻ B1 mở và công bố
+    \texttt{clue\_B1}, khẳng định C1 là tội phạm. Ở lượt kế tiếp, giả định
+    C1 vô tội mâu thuẫn với manh mối mới, nên Agent có thể mở tiếp C1.
+\end{enumerate}
+
+\subsection{Kiểm tra nghiệm duy nhất và khả năng giải tuần tự}
+
+\texttt{check\_uniqueness} trong \texttt{algorithm/validator.py} chạy ở
+giai đoạn kiểm tra màn chơi. Hàm mã hóa toàn bộ manh mối với tập trạng thái
+đã biết rỗng rồi tìm mô hình đầu tiên. Nếu công thức vô nghiệm, hàm trả
+\texttt{INCONSISTENT}. Nếu có mô hình $M$, hàm tạo một mệnh đề chặn trên
+tập ô $V$ của bàn:
+\[
+B_M =
+\bigvee_{x\in V}
+\begin{cases}
+    \neg C_x, & M(C_x)=\text{đúng},\\
+    C_x, & M(C_x)=\text{sai}.
+\end{cases}
+\]
+Mệnh đề $B_M$ buộc ít nhất một ô đổi giá trị so với $M$. Việc chỉ chặn các
+biến chính bảo đảm hai phép gán chỉ khác ở biến phụ sẽ được tính là cùng
+một nghiệm bàn cờ. Truy vấn thứ hai trả \texttt{SAT} nếu có nghiệm bàn cờ
+khác, khi đó màn được đánh dấu \texttt{MULTIPLE}. Nếu trả \texttt{UNSAT},
+validator kiểm tra lại $M$ bằng bộ đánh giá ngữ nghĩa manh mối và đối
+chiếu với đáp án lưu trữ trước khi trả \texttt{UNIQUE}.
+
+\texttt{check\_progressive\_solvability} nạp màn với đúng các thẻ được mở
+ban đầu và lặp \texttt{auto\_step} đến khi hết nước đi hoặc có nước bị từ
+chối. Hàm trả trạng thái cuối, số nước được chấp nhận, nhật ký và trạng
+thái công khai cuối cùng. Một màn có nghiệm duy nhất khi xét toàn bộ manh
+mối vẫn có thể \texttt{STUCK} nếu các mô hình của $KB_t$ cho phép cả hai
+trạng thái ở mọi ô chưa mở. Khi đó, manh mối đủ để xác định nghiệm có thể
+nằm trên các thẻ chưa mở. Với đầu vào hợp lệ, \texttt{validate\_puzzle} chỉ
+công nhận màn đạt khi cấu trúc hợp lệ, nghiệm là \texttt{UNIQUE} và quá
+trình suy luận kết thúc ở \texttt{SOLVED}.
+
+\subsection{Tính đúng đắn, chi phí và kiểm thử}
+
+Nếu encoder bảo toàn ngữ nghĩa manh mối và DPLL trả đúng kết quả SAT,
+mỗi nước đi do Agent đề xuất đúng trong mọi mô hình của tri thức công khai
+tại bước đó. Ngược lại, nếu có ít nhất một ô chưa mở mang cùng trạng thái
+trong mọi mô hình, \texttt{next\_move} sẽ tìm được một ô như vậy vì duyệt
+đến khi gặp kết luận đầu tiên. DPLL có thể rẽ nhánh nội bộ để kiểm tra tính
+khả thỏa, còn nước đi chỉ được đề xuất sau khi trạng thái đối lập đã được
+chứng minh vô nghiệm.
+
+Với $u$ ô chưa mở và $KB_t$ khả thỏa, \texttt{classify\_all} gọi DPLL
+$1+2u$ lần. Nếu \texttt{next\_move} tìm được nước ở ô thứ $j$ trong danh
+sách, hàm gọi $1+2j$ lần. Trường hợp duyệt hết có chi phí tối đa $1+2u$
+lần. Nếu $KB_t$ vô nghiệm thì một truy vấn gốc là đủ. Một lượt Auto Solve
+có nước đi còn thực hiện ba truy vấn để xác nhận lại ô được chọn. Chi phí
+mỗi truy vấn phụ thuộc vào kích thước CNF và quá trình tìm kiếm của DPLL.
+Hiện tại, encoder dựng lại công thức ở mỗi lần gọi Agent và DPLL giải từng
+truy vấn độc lập.
+
+Bộ kiểm thử \texttt{test\_deduction.py} kiểm tra các trạng thái phân loại,
+thứ tự giả định, việc ghi truy vấn của ô bị bỏ qua, cách ưu tiên phát hiện
+mâu thuẫn và mệnh đề chặn chỉ dùng biến chính. Bộ kiểm thử tích hợp
+\texttt{test\_logic\_agent.py} xác nhận Agent suy ra C3 là tội phạm trong
+màn \texttt{level\_3x3\_medium\_01} và Auto Solve đi đến \texttt{SOLVED}
+trên cả chín màn đi kèm, với mọi nước đi đều được Engine chấp nhận.
