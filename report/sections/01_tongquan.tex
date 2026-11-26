@@ -1,8 +1,88 @@
 \section{Tổng quan}
+\label{sec:tongquan}
+
 \subsection{Giới thiệu}
-% Giới thiệu Griductive Solver, luật chơi và mục tiêu đồ án.
+
+Griductive Solver là đồ án thứ hai của học phần CSC14003 -- Nhập môn
+Trí tuệ nhân tạo. Đồ án xây dựng một trò chơi suy luận trên lưới và một
+tác tử có khả năng giải tự động dựa trên logic mệnh đề. Trên bàn cờ
+$N\times N$, mỗi ô là một thẻ nhân vật có một trong hai trạng thái
+\texttt{CRIMINAL} (tội phạm) hoặc \texttt{INNOCENT} (vô tội). Mục tiêu
+của người chơi là xác định trạng thái của mọi nhân vật và mở toàn bộ thẻ
+bằng các kết luận suy ra từ thông tin công khai.
+
+Khi bắt đầu một màn, một số thẻ đã mở và công bố cả trạng thái của nhân
+vật lẫn manh mối do nhân vật đó sở hữu. Một manh mối có thể xác định trực
+tiếp trạng thái của một ô, liên hệ trạng thái giữa hai ô hoặc giới hạn
+số tội phạm trong một vùng. Chẳng hạn, nếu hàng đầu tiên có đúng một
+tội phạm và đã biết B1 là tội phạm, người chơi có thể kết luận các ô
+còn lại trên hàng đó đều vô tội. Sau khi một kết luận được chấp nhận,
+trò chơi mở thẻ tương ứng. Manh mối mới xuất hiện có thể giúp chứng minh
+trạng thái của những ô trước đó chưa xác định được.
+
+Đặc điểm của bài toán là thông tin được bổ sung qua từng nước đi. Một
+kết luận về ô chưa mở chỉ hợp lệ khi trạng thái đó đúng trong mọi cách
+gán còn phù hợp với dữ kiện công khai tại thời điểm xét. Nếu cả hai
+trạng thái của ô vẫn có thể xảy ra, người chơi cần tìm kết luận ở ô
+khác. Nếu điều này xảy ra với mọi ô chưa mở, tác tử báo \texttt{STUCK}.
+Vì vậy, hai câu hỏi cần được kiểm tra riêng là toàn bộ manh mối có xác
+định một nghiệm duy nhất hay không và từ các thẻ mở ban đầu có thể suy
+luận từng bước đến khi hoàn tất hay không.
+
 \subsection{Mục tiêu đồ án}
-% Nêu mục tiêu: mô hình hóa logic mệnh đề, CNF, DPLL, Logic Agent,
-% xây dựng game và đánh giá thực nghiệm.
+
+\begin{enumerate}
+    \item \textbf{Mô hình hóa trò chơi bằng logic mệnh đề.} Biểu diễn
+    trạng thái mỗi nhân vật bằng một biến Boolean, xây dựng ngữ nghĩa
+    cho các loại manh mối và tập hợp các dữ kiện đã công bố thành cơ sở
+    tri thức tại mỗi bước.
+    \item \textbf{Chuyển cơ sở tri thức sang CNF và kiểm tra SAT.} Xây
+    dựng bộ mã hóa để chuyển manh mối thành dạng chuẩn hội
+    (\emph{conjunctive normal form}, CNF). Cài đặt thuật toán DPLL để
+    kiểm tra tính khả thỏa của công thức bằng lan truyền đơn vị, phân
+    nhánh và quay lui.
+    \item \textbf{Xây dựng tác tử suy luận.} Dùng DPLL để kiểm tra xem
+    trạng thái đối lập với kết luận có khả thỏa cùng cơ sở tri thức hay
+    không. Từ đó, tác tử phân loại từng ô, đề xuất nước đi có thể chứng
+    minh và nhận diện trường hợp thiếu dữ kiện hoặc cơ sở tri thức mâu
+    thuẫn. Tác tử nhận trạng thái công khai từ Game Engine, còn đáp án
+    đầy đủ và các manh mối chưa mở thuộc dữ liệu nội bộ của Engine.
+    \item \textbf{Tích hợp suy luận vào trò chơi.} Dùng chung quy tắc
+    xác nhận để xử lý kết luận do người chơi gửi và nước đi do tác tử đề
+    xuất. Cung cấp giao diện để chọn màn, thao tác trên bàn, xem gợi ý
+    và theo dõi quá trình giải tự động.
+    \item \textbf{Kiểm chứng và đánh giá.} Kiểm tra tính duy nhất của
+    nghiệm, mô phỏng quá trình mở thẻ từ trạng thái ban đầu và đo chi
+    phí suy luận trên các màn có kích thước và mức độ khó khác nhau.
+\end{enumerate}
+
 \subsection{Phạm vi và đóng góp}
-% Mô tả những chức năng nhóm thực sự triển khai.
+
+Chương trình được viết bằng Python với giao diện Tkinter. Bộ dữ liệu
+gồm chín màn lưu dưới dạng JSON, với ba màn cho mỗi kích thước
+$3\times3$, $4\times4$ và $5\times5$. Hai màn mẫu $3\times3$ và
+$4\times4$ minh họa chuỗi suy luận từ một thẻ mở ban đầu. Các màn còn
+lại cung cấp những tổ hợp manh mối khác nhau để kiểm tra khả năng
+suy luận trên nhiều trạng thái bàn. Giao diện hỗ trợ chơi thủ công,
+chọn màn, nạp tệp JSON, khởi động lại, lấy gợi ý, giải tự động và dừng
+quá trình giải tự động.
+
+Bộ mã hóa hỗ trợ sáu loại manh mối \texttt{FACT}, \texttt{SAME},
+\texttt{DIFFERENT}, \texttt{EXACTLY}, \texttt{AT\_LEAST} và
+\texttt{AT\_MOST}. Các manh mối đếm có thể áp dụng trên hàng, cột, tập
+ô lân cận hoặc danh sách ô chỉ định. Hai loại vùng mở rộng cho phép
+xét bốn góc của bàn và phần giao giữa tập ô lân cận của hai nhân vật.
+Nhóm tự cài đặt bộ mã hóa CNF, thuật toán DPLL và tác tử suy luận.
+Thiết kế tách việc xử lý bàn cờ trong Game Engine, điều phối nước đi
+trong Game Controller và suy luận logic trong Logic Agent.
+
+Ngoài luồng chơi, chương trình có bộ kiểm định màn để kiểm tra cấu trúc,
+xác định tính duy nhất của nghiệm khi xét toàn bộ manh mối và kiểm tra
+khả năng giải tuần tự khi manh mối được công bố theo luật chơi. Bộ công
+cụ thực nghiệm ghi lại số biến, số mệnh đề CNF, số bước suy luận, số lần
+gọi SAT, các thống kê của DPLL và thời gian giải. Kết quả được trình bày
+theo từng màn và theo kích thước bàn, trong phạm vi chín màn của đồ án.
+
+Các mục tiếp theo trình bày mô hình bài toán, quy tắc mã hóa CNF,
+thuật toán DPLL, cách Logic Agent chọn nước đi, kiến trúc giao diện và
+kết quả thực nghiệm.
