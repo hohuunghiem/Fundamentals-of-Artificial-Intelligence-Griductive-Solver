@@ -1,8 +1,33 @@
 \clearpage
 \section{Kết luận và hướng phát triển}
 \subsection{Kết quả đạt được}
-% Tổng kết game, CNF, DPLL, Logic Agent, Validator và thực nghiệm.
+Đồ án đã tích hợp trò chơi suy luận trên lưới với bộ mã hóa CNF, thuật
+toán DPLL và Logic Agent. Người chơi và tác tử dùng cùng quy tắc mở thẻ:
+kết luận phải suy ra được từ manh mối và trạng thái đã công bố tại lượt
+đó. Giao diện hỗ trợ chơi thủ công, gợi ý và giải tự động. Bộ kiểm định
+xác nhận cả tính duy nhất của nghiệm khi dùng toàn bộ manh mối lẫn khả
+năng mở thẻ tuần tự theo luật chơi.
+
+Trong bộ dữ liệu thực nghiệm đã lưu, cả chín màn đều có nghiệm duy nhất
+và Agent hoàn tất cả 45 lượt giải. Thời gian giải trung bình theo kích
+thước $3\times3$, $4\times4$ và $5\times5$ lần lượt là 9,12 ms, 28,23 ms
+và 115,78 ms. Các phép đo này mô tả bộ màn và cấu hình chạy thực nghiệm.
+
 \subsection{Hạn chế}
-% Nêu hạn chế có bằng chứng từ code và thí nghiệm.
+Bộ dữ liệu có ba màn cho mỗi kích thước và không ghi nhận lần quay lui
+nào trong các lượt giải. Do đó, số liệu thời gian hiện tại chưa thể hiện
+chi phí của DPLL trên các màn cần tìm kiếm qua nhiều nhánh. Mã hóa tổ
+hợp trực tiếp có thể sinh nhiều mệnh đề khi vùng đếm lớn. Agent cũng
+xây lại CNF ở mỗi lần gọi và giải độc lập các truy vấn SAT, kể cả khi
+các truy vấn dùng chung phần lớn mệnh đề. Nhật ký lưu các manh mối đang
+công khai và kết quả truy vấn, nên người chơi chưa có lời giải thích
+chỉ ra tập tiền đề nhỏ đủ để chứng minh một kết luận.
+
 \subsection{Hướng phát triển}
-% Đề xuất cải tiến encoder, DPLL, agent, dữ liệu puzzle và đo hiệu năng.
+Có thể mở rộng bộ màn bằng các trường hợp buộc DPLL quay lui và các
+màn có nghiệm duy nhất nhưng bị kẹt ở trạng thái công khai. Với vùng
+đếm lớn, có thể so sánh mã hóa tổ hợp với bộ đếm tuần tự theo số mệnh
+đề, số biến phụ và thời gian giải. Một hướng khác là tái sử dụng phần
+CNF chung giữa các lượt và dùng giả định tạm trong bộ giải SAT tăng
+dần. Khi cải tiến gợi ý, có thể tìm một tập manh mối đủ để chứng minh
+nước đi và diễn giải tập đó bằng câu mô tả phù hợp với giao diện.

@@ -1,3 +1,11 @@
+\section{Mã nguồn và video demo}
+\begin{itemize}
+    \item Mã nguồn Griductive Solver trên GitHub\par
+    \url{https://github.com/hohuunghiem/Fundamentals-of-Artificial-Intelligence-Griductive-Solver}
+    \item Video demo Griductive Solver trên Google Drive\par
+    \url{https://drive.google.com/file/d/1NBbvhKspHTGH47xaYmq9ht4gE7EEVJkj/view}
+\end{itemize}
+
 \section{Hướng dẫn cài đặt và chạy chương trình}
 \begin{lstlisting}[language=bash]
 # Create and activate the environment
@@ -13,7 +21,13 @@ python main.py
 
 # Run tests
 python -m unittest discover -s tests -v
+\end{lstlisting}
 
+Chạy thực nghiệm trên Linux (ví dụ Ubuntu) vì chương trình dùng
+\texttt{SIGALRM} để giới hạn thời gian từng lượt. Trên Windows có
+thể dùng WSL với Ubuntu. Chạy các lệnh dưới đây từ \texttt{Source/}
+sau khi cài thư viện trong môi trường Linux.
+\begin{lstlisting}[language=bash]
 # Run repeated experiments
 python -m experiments.run_experiments
 
@@ -21,9 +35,9 @@ python -m experiments.run_experiments
 python -m experiments.plot_results
 \end{lstlisting}
 
+\clearpage
 \section{Phân công công việc}
-% Giữ thành viên và MSSV như trang bìa; cập nhật phân công đã thống nhất.
-\begin{table}[htbp]\centering
+\begin{table}[H]\centering
 \caption{Phân công công việc của nhóm}
 \begin{tabularx}{\linewidth}{|p{0.27\linewidth}|Y|}
 \hline
@@ -37,4 +51,9 @@ Hồ Hữu Nghiêm & Validator và Experiments.\\\hline
 \end{table}
 
 \section{Khai báo sử dụng công cụ AI}
-% Khai báo trung thực công cụ, mục đích và phạm vi sử dụng theo yêu cầu học phần.
+OpenAI Codex được dùng để hỗ trợ đọc mã nguồn, đối chiếu nội dung với
+kiểm thử và số liệu đã lưu, đồng thời hỗ trợ soạn thảo và chỉnh sửa
+các mục Tổng quan, Mô hình hóa bài toán, Logic Agent, Cài đặt và giao
+diện, Thực nghiệm và đánh giá, Kết luận và Phụ lục của báo cáo LaTeX.
+Các số liệu trình bày trong báo cáo lấy từ tệp kết quả của chương trình
+thực nghiệm. Kết quả kiểm thử được lấy từ lần chạy bộ kiểm thử Python.

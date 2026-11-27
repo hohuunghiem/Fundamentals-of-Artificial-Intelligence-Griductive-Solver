@@ -14,8 +14,8 @@ khi mã hóa toàn bộ manh mối. Trong mỗi lượt giải, nhóm đếm s�
 SAT, số quyết định phân nhánh, số phép gán do lan truyền đơn vị và
 số lần quay lui của DPLL. Mỗi thẻ được mở sau một kết luận hợp lệ
 được tính là một bước suy luận. Thời gian giải được ghi bằng mili giây.
-Bảng kết quả trình bày giá trị trung bình của các lượt hoàn tất và
-thống kê riêng số lượt lỗi hoặc vượt thời gian.
+Biểu đồ trình bày giá trị trung bình của các lượt hoàn tất. Số lượt
+lỗi hoặc vượt thời gian được ghi riêng trong kết quả thực nghiệm.
 
 \subsection{Kết quả theo kích thước bàn cờ}
 \begin{figure}[htbp]\centering
@@ -63,9 +63,12 @@ Số lần gọi SAT trung bình tương ứng là 53,67, 107,00 và 226,33.
 Ở cùng kích thước $4\times4$, màn hard có 88 mệnh đề CNF và cần
 143 lần gọi SAT, trong khi màn medium có 118 mệnh đề và chỉ cần 87 lần gọi.
 Màn hard mất trung bình 40,37 ms, so với 26,90 ms của màn medium.
-Ví dụ này cho thấy số mệnh đề CNF riêng lẻ chưa đủ để dự đoán thời gian giải.
-% Phân tích số liệu từ experiment_size_summary.csv và experiment_summary.csv.
-% Không suy rộng ngoài 9 puzzle/45 lượt chạy.
+Ví dụ này cho thấy số mệnh đề CNF riêng lẻ chưa đủ để dự đoán thời gian
+giải. Số lượt kiểm tra từng ô và chi phí xử lý mỗi truy vấn cũng ảnh
+hưởng đến tổng thời gian. Trên bàn $5\times5$, hai màn medium đều cần
+22 bước mở thẻ nhưng lần lượt dùng 167 và 229 truy vấn SAT. Số bước mở
+thẻ chỉ đếm các nước thành công, còn số truy vấn SAT phản ánh cả công
+việc kiểm tra các ô được xét trong quá trình tìm nước đi.
 \subsection{Trường hợp đặc biệt và hạn chế}
 Ở màn \texttt{demo\_4x4\_fact\_chain}, toàn bộ manh mối xác định
 một nghiệm duy nhất (\texttt{UNIQUE}). Từ một thẻ mở ban đầu, agent
@@ -75,5 +78,10 @@ thời gian trung bình 17,42 ms.
 Trong 45 lượt giải, DPLL ghi nhận 0 lần quay lui. Mỗi kích thước
 bàn chỉ có ba màn thử, nên cần bổ sung các màn buộc DPLL phải quay
 lui để đánh giá chi phí tìm kiếm trong những trường hợp khó hơn.
-% Nêu rõ đây là tính duy nhất khác với khả năng giải tuần tự.
-% Cập nhật lại nếu nhóm thay puzzle và chạy lại thí nghiệm.
+
+Kết quả \texttt{UNIQUE} của màn mẫu được xác định bằng toàn bộ manh mối,
+còn kết quả giải thành công được ghi nhận từ trạng thái chỉ mở sẵn A1.
+Hai kết quả kiểm chứng hai thuộc tính riêng của màn chơi. Bộ dữ liệu
+thực nghiệm hiện tại gồm các màn đã giải được, nên các phép đo này
+chưa mô tả hành vi của Agent khi gặp một màn hợp lệ nhưng thiếu dữ
+kiện công khai để đi tiếp.

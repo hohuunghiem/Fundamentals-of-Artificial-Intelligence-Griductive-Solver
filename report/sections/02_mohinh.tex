@@ -1,7 +1,21 @@
 \section{Mô hình hóa bài toán}
+\label{sec:mohinh}
+
 \subsection{Mô tả trò chơi}
-% Mô tả bàn cờ NxN, nhân vật, trạng thái Criminal/Innocent, clue,
-% cơ chế lật thẻ và điều kiện hoàn thành.
+
+Bàn cờ có kích thước $N\times N$ với $N\in\{3,4,5\}$. Hàng được đánh số từ
+$1$ đến $N$, cột được ký hiệu bằng các chữ cái từ A đến chữ thứ $N$. Ví dụ,
+B2 là ô ở hàng 2, cột B. Mỗi ô chứa một nhân vật và sở hữu đúng một manh
+mối. Ô sở hữu manh mối xác định thời điểm công bố manh mối đó, còn nội
+dung có thể đề cập đến những ô khác trên bàn.
+
+Tệp màn chơi cung cấp danh sách nhân vật, đáp án đầy đủ, các manh mối và
+tập thẻ mở ban đầu \texttt{initial\_revealed}. Tại mỗi lượt, người chơi
+chọn một thẻ úp và gửi kết luận tội phạm hoặc vô tội. Engine chỉ mở thẻ
+sau khi xác nhận kết luận suy ra được từ dữ kiện công khai và phù hợp
+với đáp án của màn. Khi thẻ mở, trạng thái nhân vật và manh mối của thẻ
+trở thành dữ kiện cho lượt sau. Màn hoàn tất khi tất cả $N^2$ thẻ đã mở.
+
 \subsection{Biến mệnh đề}
 Với mỗi ô $x$, định nghĩa biến Boolean $C_x$:
 \[
@@ -11,10 +25,82 @@ C_x =
 \text{False}, & \text{nếu nhân vật tại ô }x\text{ là Innocent}.
 \end{cases}
 \]
+
+Một phép gán đầy đủ $\alpha$ cung cấp giá trị cho mọi biến trên bàn.
+Đối với vùng $R$, số tội phạm theo phép gán $\alpha$ là
+\[
+s_R(\alpha)=\sum_{x\in R}\mathbf{1}\{\alpha(C_x)=\text{True}\},
+\]
+trong đó mỗi ô tội phạm đóng góp 1 và mỗi ô vô tội đóng góp 0. Một thẻ
+chưa mở có thể đã có trạng thái suy ra được từ các ràng buộc, dù giá trị
+của ô đó chưa xuất hiện trong danh sách trạng thái đã công bố.
+
 \subsection{Các loại manh mối}
-% Định nghĩa FACT, SAME, DIFFERENT, EXACTLY, AT_LEAST, AT_MOST.
+
+Mỗi manh mối có mã \texttt{id}, ô sở hữu \texttt{owner}, loại
+\texttt{type} và các trường mô tả nội dung tùy theo loại manh mối.
+Hai manh mối quan hệ dùng hai ô phân biệt $a,b$. Ba manh mối đếm dùng
+vùng $R$ và số nguyên $k$ thỏa $0\le k\le |R|$.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\linewidth}{lYl}
+\toprule
+Loại & Ngữ nghĩa & Điều kiện \\
+\midrule
+\texttt{FACT} & Ô $x$ có trạng thái được chỉ định. & $C_x$ hoặc $\neg C_x$ \\
+\texttt{SAME} & Hai ô $a,b$ cùng trạng thái. & $C_a\leftrightarrow C_b$ \\
+\texttt{DIFFERENT} & Hai ô $a,b$ khác trạng thái. & $C_a\oplus C_b$ \\
+\texttt{EXACTLY} & Vùng có đúng $k$ tội phạm. & $s_R(\alpha)=k$ \\
+\texttt{AT\_LEAST} & Vùng có ít nhất $k$ tội phạm. & $s_R(\alpha)\ge k$ \\
+\texttt{AT\_MOST} & Vùng có nhiều nhất $k$ tội phạm. & $s_R(\alpha)\le k$ \\
+\bottomrule
+\end{tabularx}
+\caption{Ngữ nghĩa của các loại manh mối}
+\end{table}
+
+Ví dụ, \texttt{DIFFERENT} giữa A1 và B2 kết hợp với dữ kiện A1 vô tội
+buộc B2 là tội phạm. Nếu có thêm manh mối \texttt{EXACTLY} 1 ở hàng 2,
+mọi ô khác trong hàng 2 phải vô tội. Ví dụ này cho thấy một kết luận
+có thể phụ thuộc đồng thời vào trạng thái đã biết và nhiều manh mối.
+
 \subsection{Vùng trên bàn cờ}
-% ROW, COLUMN, NEIGHBORS, CELLS, CORNERS, COMMON_NEIGHBORS.
+
+\begin{itemize}
+    \item \texttt{ROW} chọn mọi ô trên hàng có chỉ số \texttt{index}.
+    \item \texttt{COLUMN} chọn mọi ô trên cột có ký hiệu \texttt{label}.
+    \item \texttt{NEIGHBORS} chọn các ô kề ngang, dọc hoặc chéo của ô
+    \texttt{cell}, bỏ ô trung tâm và các vị trí ngoài bàn.
+    \item \texttt{CELLS} chọn các ô liệt kê trong trường \texttt{cells}.
+    Mỗi ô phải hợp lệ và xuất hiện tối đa một lần.
+    \item \texttt{CORNERS} chọn bốn ô góc, chẳng hạn A1, C1, A3 và C3
+    trên bàn $3\times3$.
+    \item \texttt{COMMON\_NEIGHBORS} lấy giao hai tập ô lân cận của
+    hai ô phân biệt. Trên bàn $3\times3$, A1 và C1 có hai ô lân cận
+    chung là B1 và B2.
+\end{itemize}
+
+Hàm \texttt{resolve\_region} trong \texttt{regions.py} chuẩn hóa kết quả
+theo thứ tự hàng. Khi vùng rỗng, $s_R(\alpha)=0$ với mọi phép gán và
+$k=0$ là giá trị hợp lệ duy nhất cho manh mối đếm.
+
 \subsection{Knowledge Base công khai}
-% Giải thích agent chỉ nhận clue đã mở và trạng thái đã được chứng minh,
-% không truy cập hidden solution hoặc clue chưa mở.
+
+Gọi $O_t$ là tập ô đã mở sau bước $t$, $g_x$ là ràng buộc do manh mối
+của ô $x$ biểu diễn, và $\ell_x$ là literal công bố trạng thái ô đó.
+Cơ sở tri thức tại thời điểm này là
+\[
+KB_t=\bigwedge_{x\in O_t}(g_x\land \ell_x).
+\]
+Engine cung cấp các literal này qua \texttt{known\_statuses} và các
+manh mối qua \texttt{revealed\_clues}. Encoder chuyển $KB_t$ sang CNF
+theo mục~\ref{sec:cnf}. Đáp án đầy đủ và manh mối của thẻ úp nằm trong
+dữ liệu nội bộ của Engine.
+
+Trên cơ sở tri thức khả thỏa, kết luận về một ô là hợp lệ khi mọi mô
+hình của $KB_t$ cho cùng trạng thái ô đó. Nếu tồn tại hai mô hình gán
+hai trạng thái khác nhau, ô đó chưa thể được mở ở bước hiện tại. Khi
+mở thêm một thẻ, các ràng buộc mới thu hẹp hoặc giữ nguyên tập mô hình
+còn phù hợp. Mục~\ref{sec:logic-agent} trình bày cách kiểm tra điều kiện
+này bằng DPLL.

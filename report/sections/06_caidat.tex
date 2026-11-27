@@ -1,12 +1,79 @@
 \section{Cài đặt và giao diện}
 \subsection{Kiến trúc chương trình}
-% Mô tả engine.py, controller.py, models.py, regions.py, semantics.py,
-% algorithm/ và gui/.
+Điểm vào \texttt{main.py} tạo một \texttt{LogicAgent}, truyền tác tử
+cho \texttt{GameEngine}, rồi khởi tạo \texttt{GameController}. Ở chế độ
+đồ họa, bộ điều hướng Tkinter dùng controller để chuyển từ màn hình
+chọn màn sang bàn chơi. Tùy chọn \texttt{--headless-smoke} chạy cùng
+luồng suy luận và mở thẻ qua controller trong terminal.
+
+Controller xử lý các thao tác nạp màn, khởi động lại, gợi ý và gửi kết
+luận. Engine quản lý trạng thái bàn và quyết định có mở thẻ hay không.
+Logic Agent xây dựng CNF từ trạng thái công khai rồi gọi DPLL. Sau khi
+một kết luận được chấp nhận, controller lưu ô, kết luận, các truy vấn
+SAT và manh mối vừa mở vào nhật ký.
+
 \subsection{Game Engine và ranh giới thông tin}
-% Nêu public state và việc không để agent truy cập hidden solution.
+Engine xác thực dữ liệu JSON trước khi thay màn đang chơi. Các kiểm tra
+bao gồm tập ô hợp lệ, trạng thái Boolean cho mọi ô, đúng một manh mối
+cho mỗi nhân vật, và mọi manh mối đều đúng dưới đáp án lưu trữ. Hàm
+\texttt{get\_public\_state} trả bản sao sâu gồm mã màn, kích thước,
+thông tin nhân vật, trạng thái đã công bố và các manh mối đã mở. Sửa
+bản sao này không làm thay đổi dữ liệu Engine đang giữ.
+
+Khi nhận kết luận, Engine kiểm tra tính hợp lệ của thao tác và yêu cầu
+Agent phân loại ô từ trạng thái công khai. Kết luận chưa thể chứng
+minh, bị phản bác hoặc dựa trên tri thức mâu thuẫn đều bị từ chối.
+Một kết luận được chấp nhận sau bước đối chiếu cuối với đáp án lưu
+trữ sẽ mở đúng một thẻ và trả trạng thái mới để giao diện vẽ lại bàn.
+
 \subsection{Chức năng giao diện}
-% Mô tả chọn màn, chơi tay, Hint, Auto Solve, Restart, Load, Stop nếu có.
+\begin{itemize}
+    \item \textbf{Chọn màn và xem luật.} Màn hình chính cho phép xem
+    luật và chọn một trong các màn đi kèm. Nút \texttt{LOAD} trên bàn
+    chơi cho phép chọn tệp JSON khác.
+    \item \textbf{Chơi thủ công.} Người chơi chọn ô rồi gửi kết luận
+    tội phạm hoặc vô tội. Giao diện hiển thị kết quả và cập nhật
+    manh mối khi thẻ được chấp nhận. Khi chọn một manh mối, giao diện
+    đánh dấu các ô mà manh mối đề cập.
+    \item \textbf{Gợi ý và giải tự động.} Nút \texttt{HINT} hiển thị
+    một ô và kết luận có thể chứng minh. Sau mỗi nước được chấp nhận,
+    \texttt{AUTO SOLVE} lên lịch lượt tiếp theo qua Tkinter để giao
+    diện có thể cập nhật giữa các bước. Chế độ này kết thúc khi màn
+    hoàn tất, hết nước có thể chứng minh, tri thức mâu thuẫn, hoặc nước
+    đi bị từ chối. Người chơi có thể bấm \texttt{STOP} hoặc Escape
+    để hủy lượt đã lên lịch.
+    \item \textbf{Khởi động lại.} Nút \texttt{RESTART} đưa màn về
+    tập thẻ mở ban đầu và đặt lại nhật ký các bước của controller.
+\end{itemize}
+
 \subsection{Cấu trúc mã nguồn}
-% Chèn sơ đồ hoặc cây thư mục thực tế của Source.
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\linewidth}{lY}
+\toprule
+Thành phần trong \texttt{Source/} & Trách nhiệm \\
+\midrule
+\texttt{main.py} & Khởi tạo ứng dụng và xử lý tùy chọn dòng lệnh. \\
+\texttt{engine.py}, \texttt{controller.py} & Quản lý màn, áp dụng luật và điều phối thao tác. \\
+\texttt{models.py} & Định nghĩa hợp đồng dữ liệu và kiểu kết quả. \\
+\texttt{regions.py}, \texttt{semantics.py} & Giải vùng và đánh giá trực tiếp manh mối trên phép gán. \\
+\texttt{algorithm/} & Chứa encoder CNF, DPLL, Logic Agent và validator. \\
+\texttt{gui/} & Hiển thị menu, bàn cờ, manh mối và phản hồi. \\
+\texttt{puzzles/} & Lưu các màn JSON. \\
+\texttt{tests/}, \texttt{experiments/} & Kiểm thử chức năng, chạy thực nghiệm và tạo biểu đồ. \\
+\bottomrule
+\end{tabularx}
+\caption{Các thành phần chính của mã nguồn}
+\end{table}
+
 \subsection{Kiểm thử}
-% Ghi số lượng test thực tế, lệnh chạy và kết quả đã xác nhận.
+Chạy lệnh sau trong thư mục \texttt{Source/}:
+\begin{lstlisting}
+python -m unittest discover -s tests -v
+\end{lstlisting}
+Toàn bộ 48 kiểm thử đều đạt. Bộ kiểm thử bao phủ phép giải vùng,
+ngữ nghĩa manh mối, tính tương đương giữa CNF và ngữ nghĩa, các trường
+hợp SAT/UNSAT và hành vi quay lui của DPLL. Các ca kiểm thử tích hợp
+xác nhận Engine chỉ cung cấp dữ kiện công khai, giữ nguyên bàn khi
+kết luận bị từ chối, và cho phép Agent giải hết cả chín màn đi kèm.
